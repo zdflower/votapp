@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Vota! la encuesta</title>
+	<link rel="stylesheet" href="/public/css/font-awesome.min.css"/>
+	<link rel="stylesheet" type="text/css" href="/public/css/main.css">
+</head>
+<body>
+	<div class="container">
+		<header>
+			<nav>
+				<div id="brand-nav"><i class="fa fa-thumbs-up"></i> Vota!</div>
+				<ul>
+					<li><a href="#">Home</a></li>
+					<li><a href="#">Log out</a></li>
+				</ul>
+			</nav>
+			<div id="cabecera">
+				<h1>Vota!</h1>
+			</div>
+		</header>
+		<main>
+			<section>
+				<h2>¿Cuál es el mejor club de todos los tiempos?</h2>
+				<div id="opciones">
+					<ul>
+						<li><button class="btn-add_op1">Independiente</button></li>
+						<li><button class="btn-add_op2">Otros</button></li>
+					</ul>
+				</div>
+				<div id="resultados">
+					<h3>Resultados</h3>
+					<ul>
+						<li>Independiente: <span id="click-op1"></span></li>
+						<li>Otros <span id="click-op2"></span></li>
+					</ul>
+					<div id="grafico"></div>
+				</div>
+			</section>
+		</main>
+		<footer>
+			<p>Vota! - By ZDFlower - &copy 2017 </p>
+		</footer>
+	</div>
+
+	<script type="text/javascript" src="/controllers/voteController.client.js"></script>
+</body>
+</html>
