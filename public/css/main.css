@@ -13,13 +13,14 @@ body {
 footer {
 	width: 100%;
 	text-align: center;
-	/*height: 50px;*/
-	/*position: absolute;
-	bottom: 0;*/
 	background-color: black;
 	color: orange;
   padding-top: 10px;
   padding-bottom: 10px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  margin-top: 60px;
 }
 
 p {
@@ -80,4 +81,25 @@ section {
 #brand {
 	position: relative;
 	left: 0;
+}
+
+.btn-add_op1 {
+  background-color: red;
+  padding: 10px;
+  color: aliceblue;
+  font-weight: bold;
+  margin: 10px;
+}
+
+.btn-add_op2 {
+  background-color: mediumpurple;
+  padding: 10px;
+  color: aliceblue;
+  font-weight: bold;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+#opciones ul {
+  list-style-type: none;
 }
