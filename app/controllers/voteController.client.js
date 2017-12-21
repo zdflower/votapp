@@ -35,8 +35,7 @@
 	}
 
 	function updateClickCount (data) {
-		// TODO: dependiendo de qué botón se cliqueó me gustaría que se actualizara el resultado correspondiente
-		//¿De dónde viene data?
+    //data viene del ajaxRequest
     console.log("update click count");
 		var clicksObject = JSON.parse(data);
     //console.log(clicksObject.opciones);
