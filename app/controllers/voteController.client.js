@@ -39,8 +39,11 @@
     console.log("update click count");
 		var clicksObject = JSON.parse(data);
     //console.log(clicksObject.opciones);
-		click_op1.innerHTML = clicksObject.opciones[0].votos;
-		click_op2.innerHTML = clicksObject.opciones[1].votos;
+    var votos1 = clicksObject.opciones[0].votos;
+    var votos2 = clicksObject.opciones[1].votos;
+		click_op1.innerHTML = votos1;
+		click_op2.innerHTML = votos2;
+    updateChart({votos1, votos2});
 	}
 
 	ready(ajaxRequest('GET', apiUrl1, updateClickCount));
@@ -70,5 +73,44 @@
   en vez de mostrarse los resultados correspondientes a cada opción, aparece undefined.
   RESUELTO: no accedía a los campos adecuados.
   */
+  
+  
+  /* Gráfico */
+  
+   var ctx = document.getElementById("grafico").getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ["Red", "Purple"],
+        datasets: [{
+            label: '# of Votes',
+            data: [0, 0],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(153, 102, 255, 1)',
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+
+  function updateChart(obj) {
+    myChart.data.datasets[0].data[0] = obj.votos1;
+    myChart.data.datasets[0].data[1] = obj.votos2;
+    myChart.update();
+  }
   
 })();
