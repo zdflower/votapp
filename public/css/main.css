@@ -13,11 +13,13 @@ body {
 footer {
 	width: 100%;
 	text-align: center;
-	height: 50px;
-	position: absolute;
-	bottom: 0;
+	/*height: 50px;*/
+	/*position: absolute;
+	bottom: 0;*/
 	background-color: black;
 	color: orange;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 p {
