@@ -30,12 +30,17 @@ nav {
 	color: orange;
 	height: 40px;
 	padding:20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr
+}
+
+.navnav {
+  position: absolute;
+	right: 30px;
 }
 
 nav ul {
 	list-style-type: none;
-	position: absolute;
-	right: 100px;
 }
 
 nav ul li {
@@ -49,6 +54,10 @@ nav ul li a {
 
 nav ul li a:hover {
 	color: orange;
+}
+
+nav ul li a:visited {
+	color: darkgray;
 }
 
 main {
