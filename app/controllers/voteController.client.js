@@ -43,7 +43,7 @@
     var votos2 = clicksObject.opciones[1].votos;
 		click_op1.innerHTML = votos1;
 		click_op2.innerHTML = votos2;
-    updateChart({votos1, votos2});
+    //updateChart({votos1, votos2});
 	}
 
 	ready(ajaxRequest('GET', apiUrl1, updateClickCount));
@@ -76,7 +76,7 @@
   
   
   /* Gráfico */
-  
+  /*
    var ctx = document.getElementById("grafico").getContext('2d');
   var myChart = new Chart(ctx, {
     type: 'bar',
@@ -112,5 +112,5 @@
     myChart.data.datasets[0].data[1] = obj.votos2;
     myChart.update();
   }
-  
+  */
 })();
