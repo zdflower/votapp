@@ -10,11 +10,15 @@ module.exports = function (app, db) {
 		res.sendFile(process.cwd() + '/public/index.html');
 	});
 
-	app.route('/api/clicks')
+	app.route('/api/clicks1')
 						.get(voteHandler.getClicks)
-						.post(voteHandler.addClick)
+		        .post(voteHandler.addClickOp1)
 						.delete(voteHandler.resetClicks);
 
+app.route('/api/clicks2')
+              .get(voteHandler.getClicks)
+              .post(voteHandler.addClickOp2);
+  
 	app.route('/votaEncuesta').get(function (req, res) {
 		res.sendFile(process.cwd() + '/public/votaEncuesta.html');
 	});
