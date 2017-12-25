@@ -1,0 +1,9 @@
+extends layout
+block content
+	h1 #{title}
+	form(method="post", action="/signup")
+		#form-group
+			label Id:
+			input.form-control(name="id", type='text')
+
+		input.btn.btn-primary(type="submit", value="Sign up")

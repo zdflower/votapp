@@ -1,0 +1,17 @@
+img.th {
+	width: 120px;
+}
+/*
+.panel {
+	max-width: 400px;
+}
+*/
+.jumbotron {
+	background-color: rgb(50,100,50);
+	color: beige;
+}
+
+h1 small {
+    color: gray;
+    text-align: right;
+}

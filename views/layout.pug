@@ -1,0 +1,40 @@
+doctype html
+html
+    head
+        title VotappPug
+        link(rel='stylesheet' href='/public/bower_components/bootstrap/dist/css/bootstrap.css')
+        link(rel='stylesheet' href='/public/css/style.css')
+
+    body
+
+        nav.navbar
+            .container
+                ul.nav.navbar-nav
+                    li
+                        a(href='/') Home
+                    li
+                        a(href='/usuarios') Usuarios
+                    li
+                        a(href='/signup') Sign up
+                    li
+                        a(href='/login') Log in
+                    li
+                        a(href='/login') Log out
+                    li
+                        a(href='/info') Info
+        header
+            .container
+                .jumbotron
+                    h1 VotappPug
+                      // small  - Crea encuestas, vota y observa los resultados
+        main
+            .container
+                block content
+                br
+                hr
+                footer
+                    p Copyright &copy; 2017
+
+        script(src='/public/bower_components/jquery/dist/jquery.js')
+        script(src='/public/bower_components/bootstrap/dist/bootstrap.js')
+        script(src='/public/js/main.js')

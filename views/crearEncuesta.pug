@@ -1,0 +1,14 @@
+extends layout
+block content
+	h1 #{title}
+	form(method="post", action="/" + usuario.id +"/crearEncuesta")
+		#form-group
+			label Pregunta:
+			input.form-control(name="pregunta", type='text')
+		#form-group
+			label Opción 1:
+			input.form-control(name="op1", type='text')
+			label Opción 2:
+			input.form-control(name="op2", type='text')
+
+		input.btn.btn-primary(type="submit", value="Crear encuesta")

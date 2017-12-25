@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  .row
+    .col-sm-12
+      a(href='/' + usuario.id + '/crearEncuesta') Crear Encuesta
+      h2= usuario.id
+      h3 Encuestas creadas
+        if usuario.encuestasCreadas.length > 0
+          each encuesta, i in usuario.encuestasCreadas
+            .panel.panel-success
+              .panel-heading
+                h4= encuesta.pregunta
+              .panel-body
+                p= encuesta.opciones[0].op + ': '
+                  span= encuesta.opciones[0].votos
+                p= encuesta.opciones[1].op + ': '
+                  span= encuesta.opciones[1].votos
+      h3 Encuestas votadas
+      if usuario.encuestasVotadas.length > 0
+        each encuesta, i in usuario.encuestasVotadas
+          .panel.panel-success
+            .panel-heading
+              h4= encuesta.pregunta
+            .panel-body
+              p= encuesta.opciones[0].op + ': '
+                span= encuesta.opciones[0].votos
+              p= encuesta.opciones[1].op + ': '
+                span= encuesta.opciones[1].votos
+  hr
+  a.btn.btn-default(href='/usuarios/edit/' + usuario.id) Modificar datos
+  a.btn.btn-danger.borrar-usuario(href='#', data-id=usuario.id) Eliminar cuenta de usuario

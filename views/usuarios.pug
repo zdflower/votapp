@@ -1,0 +1,17 @@
+extends layout
+block content
+  h1 #{title}
+  if usuarios.length > 0
+    ul
+      each usuario, i in usuarios
+        li.list-group-item
+          a(href="/" + usuario.id)= usuario.id
+  else
+    p No hay usuarios aún
+
+  //h2 Encuestas
+  //  if usuarios.length > 0
+  //    ul
+  //      each usuario, i in usuarios
+  //        li.list-group-item
+  //          a(href="/encuesta")= encuesta.pregunta

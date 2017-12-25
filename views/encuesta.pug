@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  .row
+    .col-sm-12
+      .panel.panel-success
+        .panel-heading
+          h2= encuesta.pregunta
+        .panel-body
+          form(method="post", action="/votar")
+            #form-group
+              label Op1:
+              input.form-control(name="op", type='radio', value='' + encuesta.opciones[0].op)
+            #form-group
+              label Op2:
+              input.form-control(name="op", type='radio', value='' + encuesta.opciones[1].op)
+
+          input.btn.btn-primary(type="submit", value="Votar")
+          p= encuesta.opciones[0].op + ': '
+            span= encuesta.opciones[0].votos
+          p= encuesta.opciones[1].op + ': '
+            span= encuesta.opciones[1].votos
+
+  hr

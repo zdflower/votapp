@@ -1,0 +1,10 @@
+extends layout
+block content
+  h1 #{title}
+  if encuestas.length > 0
+    ul
+      each encuesta, i in encuestas
+        li.list-group-item
+          a(href="/encuesta/" + encuesta.pregunta)= encuesta.pregunta
+  else
+    p No hay encuestas aún
