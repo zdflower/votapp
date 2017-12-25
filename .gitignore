@@ -1,0 +1,7 @@
+node_modules/
+.env
+public/bower_components/
+public/css/font-awesome.min.css
+public/fonts/
+public/js/Chart.js
+
