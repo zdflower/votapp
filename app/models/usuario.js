@@ -8,17 +8,8 @@ let Usuario = mongoose.Schema({
     		type: String,
     		required: true
     	},
-      // me gustaría utilizar encuesta como esquema anidado, pero no sé cómo
-    	encuestasCreadas: [ {
-          pregunta : { type: String, required: true },
-          opciones : [ { op: { type: String }, votos: {type: Number}
-          }]
-      }],
-      encuestasVotadas: [ {
-          pregunta : { type: String, required: true },
-          opciones : [ { op: { type: String }, votos: {type: Number}
-          }]
-      }]
+    	encuestasCreadas: [ {pregunta : { type: String} }],
+      encuestasVotadas: [ {pregunta : { type: String} }]
     });
 
 module.exports = mongoose.model('Usuario', Usuario);

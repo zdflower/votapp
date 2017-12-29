@@ -5,17 +5,16 @@ block content
     .col-sm-12
       .panel.panel-success
         .panel-heading
-          h2= encuesta.pregunta
+          h2= '¿' + encuesta.pregunta + '?'
         .panel-body
-          form(method="post", action="/votar")
+          form(method="POST", action="/encuesta")
             #form-group
-              label Op1:
-              input.form-control(name="op", type='radio', value='' + encuesta.opciones[0].op)
+              label= encuesta.opciones[0].op + ': '
+                input.form-control(name="op", type='radio', value='' + encuesta.opciones[0].op)
             #form-group
-              label Op2:
-              input.form-control(name="op", type='radio', value='' + encuesta.opciones[1].op)
-
-          input.btn.btn-primary(type="submit", value="Votar")
+              label= encuesta.opciones[1].op + ': '
+                input.form-control(name="op", type='radio', value='' + encuesta.opciones[1].op) 
+            input.btn.btn-primary(type="submit", value="Votar")
           p= encuesta.opciones[0].op + ': '
             span= encuesta.opciones[0].votos
           p= encuesta.opciones[1].op + ': '

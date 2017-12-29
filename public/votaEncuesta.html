@@ -24,12 +24,22 @@
 		<main>
 			<section id="encuesta">
 				<h2>¿Cuál es el mejor club de todos los tiempos?</h2>
-				<div id="opciones">
+        <form action="/votaEncuesta" method="post">
+				<label>
+          <input type="radio" name="op" value="OP1"> Op1
+        </label>
+        <label>
+          <input type="radio" name="op" value="OP2"> Op2
+        </label>
+          <input type="submit" value="Votar">
+          <!-- <div id="opciones">
 					<ul>
 						<li><button class="btn-add_op1">Independiente</button></li>
 						<li><button class="btn-add_op2">Otros</button></li>
 					</ul>
+          -->
 				</div>
+        </form>
 				<div id="resultados">
 					<h3>Resultados</h3>
 					<ul>
@@ -47,9 +57,10 @@
 
   <!--
   <script type="text/javascript"  src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js"></script>
-  -->
-  
+
+  -->  
 	<script type="text/javascript" src="/controllers/voteController.client.js"></script>
-  
+
+
 </body>
 </html>
