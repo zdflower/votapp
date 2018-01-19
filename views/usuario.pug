@@ -1,23 +1,21 @@
 extends layout
 
 block content
+  script(src='/js/main.js')
   .row
     .col-sm-12
-      a(href='/' + usuario.id + '/crearEncuesta') Crear Encuesta
-      h2= usuario.id
+      a(href= usuario.url + '/crearEncuesta') Crear Encuesta
+      h2= usuario_nombre
+      // - h2= usuario.local.username
       h3 Encuestas creadas
-        if usuario.encuestasCreadas.length > 0
-          each encuesta, i in usuario.encuestasCreadas
+        if encuestas
+          each encuesta, i in encuestas
             .panel.panel-success
               .panel-heading
-                h4 
-                  a(href='/encuesta/' + encuesta.pregunta)= encuesta.pregunta
-      h3 Encuestas votadas
-      if usuario.encuestasVotadas.length > 0
-        each encuesta, i in usuario.encuestasVotadas
-          .panel.panel-success
-            .panel-heading
-              h4= encuesta.pregunta
+                h4
+                  a(href= encuesta.url)= encuesta.pregunta
+                  span=' '
+                  if usuario.local.username == encuesta.creador
+                    button.btn.btn-danger(class="borrar_encuesta" href="#" data-id= encuesta.url) Borrar encuesta
   hr
-  a.btn.btn-default(href='/usuarios/edit/' + usuario.id) Modificar datos
-  a.btn.btn-danger.borrar-encuesta(href='#', data-id='') Eliminar encuesta
+  a.btn.btn-danger.borrar-usuario(href='#', data-id=id) Eliminar cuenta de usuario

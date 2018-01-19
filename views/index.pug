@@ -5,6 +5,6 @@ block content
     ul
       each encuesta, i in encuestas
         li.list-group-item
-          a(href="/encuesta/" + encuesta.pregunta)= encuesta.pregunta
+          a(href= encuesta.url)= encuesta.pregunta
   else
     p No hay encuestas aún

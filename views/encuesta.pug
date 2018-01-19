@@ -1,23 +1,26 @@
 extends layout
-
 block content
   .row
     .col-sm-12
       .panel.panel-success
         .panel-heading
           h2= '¿' + encuesta.pregunta + '?'
+            small= '  ' + encuesta.creador
         .panel-body
-          form(method="POST", action="/encuesta")
-            #form-group
-              label= encuesta.opciones[0].op + ': '
-                input.form-control(name="op", type='radio', value='' + encuesta.opciones[0].op)
-            #form-group
-              label= encuesta.opciones[1].op + ': '
-                input.form-control(name="op", type='radio', value='' + encuesta.opciones[1].op) 
-            input.btn.btn-primary(type="submit", value="Votar")
-          p= encuesta.opciones[0].op + ': '
-            span= encuesta.opciones[0].votos
-          p= encuesta.opciones[1].op + ': '
-            span= encuesta.opciones[1].votos
+          form(method="post", action= encuesta.url)
+            each opcion, i in encuesta.opciones
+              .form-check
+                input.form-check-input(name="op", type='radio', value='' + opcion.op)
+                label.form-check-label= opcion.op
 
-  hr
+            input.btn.btn-primary(type="submit", value="Votar")
+
+      h3 Resultados
+      each opcion, i in encuesta.opciones
+        p= opcion.op + ': '
+          span= opcion.votos
+
+      #pregunta(pregunta= encuesta.pregunta)
+      canvas#grafico
+      script(src='/js/Chart.js')
+      script(src='/js/grafico.js')

@@ -5,13 +5,6 @@ block content
     ul
       each usuario, i in usuarios
         li.list-group-item
-          a(href="/" + usuario.id)= usuario.id
+          a(href= usuario.url)= usuario.local.username
   else
     p No hay usuarios aún
-
-  //h2 Encuestas
-  //  if usuarios.length > 0
-  //    ul
-  //      each usuario, i in usuarios
-  //        li.list-group-item
-  //          a(href="/encuesta")= encuesta.pregunta

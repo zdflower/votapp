@@ -1,17 +1,106 @@
+/* Sticky footer at the bottom*/
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 40px;
+}
+
+footer {
+  height: 40px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+
+/***/
+/* copio los valores de bootstrap alert-danger */
+.alert-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+a#logout {
+  font-size: 0.7em;
+  margin-left: 10px;
+}
+
 img.th {
 	width: 120px;
 }
-/*
-.panel {
-	max-width: 400px;
-}
-*/
+
 .jumbotron {
 	background-color: rgb(50,100,50);
 	color: beige;
+  text-align: center;
 }
 
 h1 small {
     color: gray;
     text-align: right;
+}
+input[type="radio"] {
+	width: 40px;
+	display: inline;
+}
+
+#grafico {
+  width: 200px;
+  height: 200px;
+}
+
+.logo {
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: beige;
+  color: darkgreen;
+  height: 52px;
+}
+
+.logo h4 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+.navbar {
+  margin-bottom: 0;
+  border: 0;
+}
+
+#user_nav {
+    float: right;
+}
+
+#common_nav {
+  float:left;
+}
+
+#login {
+  text-align: center;
+}
+
+
+/* Media queries */
+
+@media screen and (max-width: 769px) {
+.logo h4 {
+    position: absolute;
+  }
+  .nav li a {
+    display: inline;
+  }
+  .nav li {
+    display: inline;
+  }
+
+}
+
+@media screen and (min-width: 770px) {
+  .logo {
+    float: left;
+    display: block;
+  }
+
 }

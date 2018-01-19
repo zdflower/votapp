@@ -1,40 +1,63 @@
 doctype html
 html
-    head
-        title VotappPug
-        link(rel='stylesheet' href='/public/bower_components/bootstrap/dist/css/bootstrap.css')
-        link(rel='stylesheet' href='/public/css/style.css')
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width = device-width, initial-scale = 1")
+    title VotappPug
+    // - Para evitar que haga request por el favicon
+    // - fuente: https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests
+    link(rel='icon' href='data:,')
+    link(rel='stylesheet' href='/bower_components/bootstrap/dist/css/bootstrap.css')
+    link(rel='stylesheet' href='/css/font-awesome.min.css')
+    link(rel='stylesheet' href='/css/style.css')
 
-    body
+  body
+    nav.navbar
+      .logo
+        h4 Votapp
+      .container
+        ul#common_nav.nav.navbar-nav
+          li
+            a(href='/') Encuestas #{' '}
+              i.fa.fa-home
+          li
+            a(href='/usuarios') Usuarios #{' '}
+              i.fa.fa-users
+          li
+            a(href='/info') Info #{' '}
+              i.fa.fa-info-circle
 
-        nav.navbar
-            .container
-                ul.nav.navbar-nav
-                    li
-                        a(href='/') Home
-                    li
-                        a(href='/usuarios') Usuarios
-                    li
-                        a(href='/signup') Sign up
-                    li
-                        a(href='/login') Log in
-                    li
-                        a(href='/login') Log out
-                    li
-                        a(href='/info') Info
-        header
-            .container
-                .jumbotron
-                    h1 VotappPug
-                      // small  - Crea encuestas, vota y observa los resultados
-        main
-            .container
-                block content
-                br
-                hr
-                footer
-                    p Copyright &copy; 2017
+        ul#user_nav.nav.navbar-nav
+          if usuario
+            li
+              a(href= usuario.url + '/crearEncuesta' title='Nueva encuesta')
+                i.fa.fa-plus-square
+            li
+              a(href= usuario.url) #{usuario.local.username} #{' '}
+                i.fa.fa-user-circle
+            li
+              a(href='/logout' id='logout') Log out #{' '}
+                i.fa.fa-power-off
+          else
+            li
+              a(href='/signup') Sign up #{' '}
+                i.fa.fa-sign-in
+            li
+              a(href='/login') Log in #{' '}
+                i.fa.fa-hand-o-up
+    header
+      .jumbotron
+        h1 VotappPug
+    main
+      script(src='/bower_components/jquery/dist/jquery.js')
+      script(src='/bower_components/bootstrap/dist/js/bootstrap.js')
 
-        script(src='/public/bower_components/jquery/dist/jquery.js')
-        script(src='/public/bower_components/bootstrap/dist/bootstrap.js')
-        script(src='/public/js/main.js')
+      != messages('mensajes', locals)
+
+      .container
+        block content
+    br
+    footer
+      .container
+        p Copyright &copy; 2018
