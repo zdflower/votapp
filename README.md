@@ -11,6 +11,12 @@
 - [x] As an unauthenticated or authenticated user, I can see the results of polls in chart form. (This could be implemented using Chart.js or Google Charts.)
 - [x] As an authenticated user, if I don't like the options on a poll, I can create a new option.
 
+## Other things to do:
+
+- [ ] Github authentication
+- [ ] mLab online database
+- [ ] Add form validation.
+
 ## Comments
 
 I am learning a lot from the task itself and the bugs I make (mostly the process of finding and repair).
