@@ -141,10 +141,11 @@ exports.borrarEncuesta = function (req, res, next) {
   Encuesta.remove({pregunta: pregunta, creador: req.user.local.username}, function(err) {
       if (err) {
         return next(err);
-      } else {
-        req.flash('success', 'Encuesta borrada.');
-        res.redirect('/');
       }
+      console.log("ENCUESTA BORRADA")
+      // No muestra el mensaje flash...
+      req.flash('success', 'Encuesta borrada.');
+      res.redirect('/');
   });
 };
 
