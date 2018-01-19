@@ -135,9 +135,18 @@ exports.obtenerOpcionesAPI = function(req, res, next) {
 
 //SIN IMPLEMENTAR AÚN
 exports.borrarEncuesta = function (req, res, next) {
-  req.flash('success', 'Encuesta borrada. SIN IMPLEMENTAR AÚN');
-  res.redirect('/');
-}
+  //busco si existe una encuesta con la pregunta dada y el usuario logueado
+  // en caso de que exista, remove
+  let pregunta = req.params.pregunta;
+  Encuesta.remove({pregunta: pregunta, creador: req.user.local.username}, function(err) {
+      if (err) {
+        return next(err);
+      } else {
+        req.flash('success', 'Encuesta borrada.');
+        res.redirect('/');
+      }
+  });
+};
 
 // Función auxiliar no exportada
 let nuevaEncuesta = function (data) {
