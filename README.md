@@ -16,6 +16,7 @@
 - [ ] Github authentication
 - [ ] mLab online database
 - [ ] Add form validation.
+- [ ] Use cdn links for bootstrap, jquery, chart.js, fontawesome.
 
 ## Comments
 
