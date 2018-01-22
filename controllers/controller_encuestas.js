@@ -46,44 +46,36 @@ exports.crearEncuesta_get = function(req, res){
   res.render('crearEncuesta', {usuario: req.user});
 };
 
+// Reescribir esta función:
+// No hay que chequear si el usuario está logueado, si no está no llegaría hasta acá.
+// Hay que validar los datos enviados por el usuario.
+// En req.body tenemos: {'pregunta': "...", 'opciones[]': ["...", "..."]},
+// pregunta no debe ser vacía y opciones tiene que tener por lo menos dos elementos,
+// además todos los elementos de opciones deben ser no vacíos.
+
 exports.crearEncuesta_post = function(req, res, next) {
   console.log("Crea encuesta.");
-  //console.log("req.params: ");
-  //console.log(req.params);
-  //Debe estar logueado y ser el mismo que el de la dirección
   let usuario_logueado = req.user;
-  if (usuario_logueado){
-    let encuesta = nuevaEncuesta(req.body);
-    if (encuesta.pregunta.length >= 2){
-      let nueva_encuesta = new Encuesta(encuesta);
-      nueva_encuesta.creador = usuario_logueado.local.username;
-      nueva_encuesta.save( function (err) {
-        console.log("Guardando encuesta en la base de datos de encuestas.")
-        if (err) {
-          //Ver cómo manejar el error con next...
-
-          //res.send(err);
-          req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
-          res.redirect(usuario_logueado.url + '/crearEncuesta');
-        }
-        else {
-          req.flash('success', 'Encuesta creada');
-          res.redirect(nueva_encuesta.url);
-        }
-      });
-    }
-    else {
-      //ver cómo manejar el error con next
-      req.flash('error', 'ERROR: La pregunta debe tener al menos 2 caracteres.');
-      res.redirect('/' + req.params.username + '/crearEncuesta');
-      //res.send("ERROR: La pregunta debe tener al menos 2 caracteres.");
-    }
+  if (req.body.pregunta.length >= 2){
+    let nueva_encuesta = new Encuesta(nuevaEncuesta(req.body));
+    // Antes de esto hay que asegurarse que está todo ok con la creación de la encuesta.
+    nueva_encuesta.creador = usuario_logueado.local.username;
+    nueva_encuesta.save( function (err) {
+      console.log("Guardando encuesta en la base de datos de encuestas.")
+      if (err) {
+        //res.send(err);
+        req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
+        res.redirect(usuario_logueado.url + '/crearEncuesta');
+      } else {
+        req.flash('success', 'Encuesta creada');
+        //res.redirect(nueva_encuesta.url);
+        res.send('Ok');
+      }
+    });
   } else {
-    // ver cómo manejar el error con next
-      req.flash('error', 'ERROR: Debe estar logueado.');
-      res.redirect('/login');
+    req.flash('error', 'ERROR: La pregunta debe tener al menos 2 caracteres.');
+    res.redirect(usuario_logueado.url + '/crearEncuesta');
   }
-
 };
 
 exports.votarEncuesta = function(req, res, next) {
@@ -133,7 +125,7 @@ exports.obtenerOpcionesAPI = function(req, res, next) {
 });
 }
 
-//SIN IMPLEMENTAR AÚN
+// Revisar
 exports.borrarEncuesta = function (req, res, next) {
   //busco si existe una encuesta con la pregunta dada y el usuario logueado
   // en caso de que exista, remove
