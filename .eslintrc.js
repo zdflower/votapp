@@ -5,7 +5,7 @@ module.exports = {
     	 "space-before-function-paren": ["off"],
     	 "camelcase": ["off"],
        "block-spacing": ["off"],
-       "space-before-blocks": ["off"]
-
+       "space-before-blocks": ["off"],
+       "quotes": ["off"]
     }
 };
