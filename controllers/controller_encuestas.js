@@ -135,9 +135,8 @@ exports.borrarEncuesta = function (req, res, next) {
       return next(err);
     }
     console.log("ENCUESTA BORRADA")
-    // No muestra el mensaje flash...
     req.flash('success', 'Encuesta borrada.');
-    res.redirect('/');
+    res.send('OK');
   });
 };
 
