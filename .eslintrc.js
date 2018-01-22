@@ -7,6 +7,11 @@ module.exports = {
        "block-spacing": ["off"],
        "space-before-blocks": ["off"],
        "quotes": ["off"],
-       "key-spacing": ["off"]
+       "key-spacing": ["off"],
+       "no-undef": ["off"],
+       "no-unused-expressions": ["off"],
+       "no-sequences": ["off"],
+       "space-infix-ops": ["off"],
+       "no-redeclare": ["off"]
     }
 };
