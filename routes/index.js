@@ -5,7 +5,6 @@ const ControllerUsuarios = require('../controllers/controller_usuarios.js');
 
 module.exports = function(app, passport){
 // REVISAR Y REESCRIBIR ESTA FUNCIÓN:
-  // Ver cómo manejar estos errores con next...
   function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
       if (req.user.local.username === req.params.username){
@@ -17,18 +16,18 @@ module.exports = function(app, passport){
         return next();
       } else {
         // req.flash('warning', 'Los usuarios no coinciden. Vuelva a su propio perfil.');
-
         console.log("Los usuarios NO coinciden.")
         // console.log("Usuario registrado: " + req.user.local.username);
         // console.log("Parámetro usuario: " + req.params.username);
         // console.log("Params:");
         // console.log(req.params);
-        res.send("El usuario logueado y el de la página a la que quiere acceder no coinciden.");
+        // res.send("El usuario logueado y el de la página a la que quiere acceder no coinciden.");
         /*
           const error = new Error("El usuario logueado y el de la página a la que quiere acceder no coinciden.");
           error.status = 404;
           next(error);
         */
+        return next();
       }
     } else {
       req.flash("warning", 'Si ya está registrado, debe loguearse. Si no está registrado, por favor regístrese y luego ingrese mediante login.');
