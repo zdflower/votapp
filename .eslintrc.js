@@ -6,6 +6,7 @@ module.exports = {
     	 "camelcase": ["off"],
        "block-spacing": ["off"],
        "space-before-blocks": ["off"],
-       "quotes": ["off"]
+       "quotes": ["off"],
+       "key-spacing": ["off"]
     }
 };
