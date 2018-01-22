@@ -54,23 +54,24 @@ exports.crearEncuesta_get = function(req, res){
 // además todos los elementos de opciones deben ser no vacíos.
 
 exports.crearEncuesta_post = function(req, res, next) {
-  console.log("Crea encuesta.");
+  console.log("POST: CREA ENCUESTA.");
   let usuario_logueado = req.user;
   if (req.body.pregunta.length >= 2){
+    // Antes de esto hay que validar los datos
     let nueva_encuesta = new Encuesta(nuevaEncuesta(req.body));
-    // Antes de esto hay que asegurarse que está todo ok con la creación de la encuesta.
+    // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
     nueva_encuesta.creador = usuario_logueado.local.username;
     nueva_encuesta.save(function (err) {
       console.log("Guardando encuesta en la base de datos de encuestas.")
       if (err) {
-        // res.send(err);
         req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
-        res.redirect(usuario_logueado.url + '/crearEncuesta');
-      } else {
-        req.flash('success', 'Encuesta creada');
-        // res.redirect(nueva_encuesta.url);
-        res.send('Ok');
+        // res.redirect(usuario_logueado.url + '/crearEncuesta');
+        res.send(err);
       }
+      // si no hubo error llegamos acá, si hubo error, creo que no llegás acá.
+      req.flash('success', 'Encuesta creada');
+      // res.redirect(nueva_encuesta.url);
+      res.send('Ok');
     });
   } else {
     req.flash('error', 'ERROR: La pregunta debe tener al menos 2 caracteres.');
@@ -141,6 +142,7 @@ exports.borrarEncuesta = function (req, res, next) {
 };
 
 // Función auxiliar no exportada
+// data =  {'pregunta': "...", 'opciones[]': ["...", "..."]}
 let nuevaEncuesta = function (data) {
   console.log("Nueva encuesta.")
   let preg = data.pregunta;
@@ -148,14 +150,9 @@ let nuevaEncuesta = function (data) {
   preg = (preg.charAt(0) === '¿') ? preg.slice(1, preg.length) : preg;
   preg = (preg.charAt(preg.length - 1) === '?') ? preg.slice(0, preg.length - 1) : preg;
 
-  let opciones = [];
-
-  // es importante el let
-  for (let item in data) {
-    if (item !== 'pregunta') {
-      opciones.push({ op : data[item], votos : 0 })
-    }
-  }
+  let opciones = data["opciones[]"].map(function(opcion){
+    return {op : opcion, votos : 0};
+  });
 
   return {
     pregunta : preg,
