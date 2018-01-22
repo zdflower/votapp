@@ -93,7 +93,11 @@ app.use(function(req, res, next){
 // manejador de todo tipo de errores que  pueden suceder llegado este punto.
 app.use(function(err, req, res, next){
   res.status(err.status || 500);
-  res.render('error', {error: err});
+  if (req.user){
+    res.render('error', {error: err, usuario: req.user});
+  } else {
+    res.render('error', {error: err});
+  }
 });
 
 // Start server
