@@ -1,15 +1,15 @@
 extends layout
 block content
   h1 Nueva Encuesta
-  form(method="post", action= usuario.url +"/crearEncuesta")
+  form
     .form-group
       label Pregunta:
       input.form-control(name="pregunta", type='text')
     .form-group#opciones
       label Opción 1:
-      input.form-control(name="op1", type='text')
+      input.form-control.opcion(name="op1", type='text')
       label Opción 2:
-      input.form-control(name="op2", type='text')
+      input.form-control.opcion(name="op2", type='text')
     .form-group
       input.btn.btn-primary#agregaop(type="button", value="Agregar otra opción")
     input.btn.btn-primary(type="submit", value="Crear encuesta")
