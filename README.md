@@ -22,7 +22,7 @@
 
 I am learning a lot from the task itself and the bugs I make (mostly the process of finding and repair).
 
-There are many sources that helped me learn, understand various aspects of the project and solving problems: 
+There are many sources that helped me learn, understand various aspects of the project and solving problems:
 
 * Clementine.js http://www.clementinejs.com/
 * Node & Express from Scratch https://github.com/bradtraversy/nodekb
@@ -35,7 +35,7 @@ There are many sources that helped me learn, understand various aspects of the p
 * Pug https://pugjs.org/api/getting-started.html
 * Mongoose http://mongoosejs.com/docs/ and MongoDB manual https://docs.mongodb.com/manual/
 * FCC Forum https://forum.freecodecamp.org
-* Stackoverflow, por ejemplo 
+* Stackoverflow, por ejemplo
  * https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests
  * https://stackoverflow.com/questions/32811510/mongoose-findoneandupdate-doesnt-return-updated-document#32811548
  * etc.
@@ -44,3 +44,9 @@ There are many sources that helped me learn, understand various aspects of the p
 * https://caolan.github.io/async/docs.html
 * https://github.com/bocoup/jqfundamentals.com
 * etc.
+
+## Other Comments
+
+* For the moment anyone can vote any number of times.
+* You can share a poll by copying the link of that poll's page.
+* I would like to improve the design of the pages, in particular the user's page.
