@@ -7,15 +7,17 @@ block content
       a(href= usuario.url + '/crearEncuesta') Crear Encuesta
       h2= usuario_nombre
       // - h2= usuario.local.username
-      h3 Encuestas creadas
-        if encuestas
-          each encuesta, i in encuestas
-            .panel.panel-success
-              .panel-heading
-                h4
-                  a(href= encuesta.url)= encuesta.pregunta
-                  span=' '
-                  if usuario.local.username == encuesta.creador
-                    button.btn.btn-danger(class="borrar_encuesta" href="#" data-id= encuesta.url) Borrar encuesta
-  hr
-  a.btn.btn-danger.borrar-usuario(href='#', data-id=id) Eliminar cuenta de usuario
+      h3 Mis encuestas
+      if encuestas
+        each encuesta, i in encuestas
+          .panel.panel-success
+            .panel-heading
+              h4
+                a(href= encuesta.url)= encuesta.pregunta
+              // - a.btn.btn-sm.btn-success(href= encuesta.url) Comparte la encuesta
+            .panel-body
+              h5 Opción más votada: #{encuesta.opMasVotada.op} (#{encuesta.opMasVotada.votos} votos de un total de #{encuesta.totalVotos}),
+              if usuario.local.username == encuesta.creador
+                button.btn.btn-sm.btn-warning.borrar_encuesta(href="#" data-id= encuesta.url) Borrar la encuesta
+  // - hr
+  // - a.btn.btn-danger.borrar-usuario(href='#', data-id=id) Eliminar cuenta de usuario
