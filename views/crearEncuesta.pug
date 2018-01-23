@@ -3,6 +3,9 @@ block content
   h1 Nueva Encuesta
   form
     .form-group
+      label Usuario
+      input.form-control(name="usuario" disabled="true" value= usuario.local.username placeholder= usuario.local.username)
+    .form-group
       label Pregunta:
       input.form-control(name="pregunta", type='text')
     .form-group#opciones
