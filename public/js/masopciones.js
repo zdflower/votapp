@@ -1,14 +1,20 @@
 $(document).ready(function(){
+  var appUrl = window.location.origin;
   var cantOpciones = 2;
   $('#agregaop').click(function(){
     // agregar al formgroup de opciones un
     cantOpciones += 1;
-    var opcion = '<div><label>Nueva opción</label><input class="form-control opcion" name="op'+ cantOpciones +'" type="text"> <button class="borrar btn btn-danger">borrar opción</button></div>';
-    console.log('Agrego opción');
+
+    var opcion =
+    '<div><label>Nueva opción</label>' +
+    '<div class="input-group">' +
+    '<input class="form-control opcion" name="op' + cantOpciones +'" type="text" autofocus>' +
+    '<span class="input-group-btn"><button class="borrar btn btn-danger">borrar opción</button></span>' +
+    '</div>' +
+    '</div>';
     $('#opciones').append(opcion);
     // console.log("cantOpciones: " + cantOpciones);
     $('.borrar').click(function(){
-      console.log('Borro opción.');
       $(this).parent().remove();
       // console.log("cantOpciones: " + cantOpciones);
     });
@@ -22,7 +28,7 @@ $(document).ready(function(){
     opciones = opciones.map(function(op) { return op.value; });
     let datos = {pregunta: pregunta, opciones: opciones};
     // Hago un pedido post
-    $.ajax('/:usuario/crearEncuesta', {
+    $.ajax(appUrl + '/:username/crearEncuesta', {
       type: 'POST',
       data: datos,
       success: function(data, status){
@@ -34,10 +40,10 @@ $(document).ready(function(){
         }
       },
       error:  function(data) {
-        console.log('Error en el pedido post. ');
-        console.log(data);
+        alert('Error en el pedido post. ');
+        alert(data);
         // Volver a la página de crear encuestas
-        window.location.href='/:usuario/crearEncuesta';
+        window.location.href= appUrl + '/:username/crearEncuesta';
       }
     }); // ajax post
   }); // form
