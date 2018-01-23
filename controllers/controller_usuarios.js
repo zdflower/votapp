@@ -123,6 +123,7 @@ exports.locallogin_post = function(req, res, next){
   passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
+    successFlash: '¡Hola!',
     failureFlash: true
   })(req, res, next);
 };
