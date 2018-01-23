@@ -172,34 +172,26 @@ function indiceDe(elem, arrDeObj){
     }
   }
   return indice;
-}
+};
+
+/*
+Crear encuesta:
+
+el $.ajax() vuelve por el lado del error aunque se haya creado la encuesta
+
+*/
 
 
 /*
-POST /:username/crearEncuesta - - ms - -
-isLoggedIn
-req.params:
-{ username: ':username' }
-Los usuarios NO coinciden.
-POST: CREA ENCUESTA.
-Nueva encuesta.
-nueva_encuesta:
-{ opciones:
-   [ { _id: 5a675e1eadd36c1b97954365, op: 'Lunes', votos: 0 },
-     { _id: 5a675e1eadd36c1b97954364, op: 'Martes', votos: 0 } ],
-  _id: 5a675e1eadd36c1b97954363,
-  pregunta: 'Qué día es hoy',
-  creador: 'FDZ' }
-isLoggedIn
-req.params:
-{ username: 'Debby' }
-Los usuarios NO coinciden.
-GET /Debby/crearEncuesta?pregunta=%C2%BFQu%C3%A9+d%C3%ADa+es+hoy%3F&op1=Lunes&op2=Martes 200 93.544 ms - 2120
-GET /bower_components/bootstrap/dist/css/bootstrap.css 304 0.826 ms - -
-GET /css/font-awesome.min.css 304 2.238 ms - -
-GET /css/style.css 304 1.518 ms - -
-GET /bower_components/jquery/dist/jquery.js 304 0.931 ms - -
-GET /bower_components/bootstrap/dist/js/bootstrap.js 304 0.880 ms - -
-GET /js/masopciones.js 304 0.935 ms - -
-
+// Así está MAL
+// ¿Cómo debo escribir esta pregunta?
+function preguntaRepetida(pregunta, username, next) {
+  Encuesta.findOne({pregunta: pregunta, creador: username}, function(err, encuesta) {
+    if (err) {
+      return next(err);
+    } else {
+      return next(null); //¿?
+    }
+  });
+};
 */
