@@ -61,9 +61,11 @@ exports.crearEncuesta_post = function(req, res, next) {
     let nueva_encuesta = new Encuesta(nuevaEncuesta(req.body));
     // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
     nueva_encuesta.creador = usuario_logueado.local.username;
+    console.log("nueva_encuesta: ");
+    console.log(nueva_encuesta);
     nueva_encuesta.save(function (err) {
-      console.log("Guardando encuesta en la base de datos de encuestas.")
       if (err) {
+        console.log("Error guardando encuesta.");
         req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
         // res.redirect(usuario_logueado.url + '/crearEncuesta');
         res.send(err);
@@ -74,6 +76,7 @@ exports.crearEncuesta_post = function(req, res, next) {
       res.send('Ok');
     });
   } else {
+    console.log('ERROR: La pregunta debe tener al menos 2 caracteres.');
     req.flash('error', 'ERROR: La pregunta debe tener al menos 2 caracteres.');
     res.redirect(usuario_logueado.url + '/crearEncuesta');
   }
@@ -129,6 +132,7 @@ exports.obtenerOpcionesAPI = function(req, res, next) {
 exports.borrarEncuesta = function (req, res, next) {
   // busco si existe una encuesta con la pregunta dada y el usuario logueado
   // en caso de que exista, remove
+  // req.user debe existir puesto que para borrar una encuesta tenés que estar logueado.
   let pregunta = req.params.pregunta;
   Encuesta.remove({pregunta: pregunta, creador: req.user.local.username}, function(err) {
     if (err) {
@@ -168,3 +172,33 @@ function indiceDe(elem, arrDeObj){
   }
   return indice;
 }
+
+
+/*
+POST /:username/crearEncuesta - - ms - -
+isLoggedIn
+req.params:
+{ username: ':username' }
+Los usuarios NO coinciden.
+POST: CREA ENCUESTA.
+Nueva encuesta.
+nueva_encuesta:
+{ opciones:
+   [ { _id: 5a675e1eadd36c1b97954365, op: 'Lunes', votos: 0 },
+     { _id: 5a675e1eadd36c1b97954364, op: 'Martes', votos: 0 } ],
+  _id: 5a675e1eadd36c1b97954363,
+  pregunta: 'Qué día es hoy',
+  creador: 'FDZ' }
+isLoggedIn
+req.params:
+{ username: 'Debby' }
+Los usuarios NO coinciden.
+GET /Debby/crearEncuesta?pregunta=%C2%BFQu%C3%A9+d%C3%ADa+es+hoy%3F&op1=Lunes&op2=Martes 200 93.544 ms - 2120
+GET /bower_components/bootstrap/dist/css/bootstrap.css 304 0.826 ms - -
+GET /css/font-awesome.min.css 304 2.238 ms - -
+GET /css/style.css 304 1.518 ms - -
+GET /bower_components/jquery/dist/jquery.js 304 0.931 ms - -
+GET /bower_components/bootstrap/dist/js/bootstrap.js 304 0.880 ms - -
+GET /js/masopciones.js 304 0.935 ms - -
+
+*/
