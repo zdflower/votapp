@@ -52,12 +52,13 @@ exports.crearEncuesta_get = function(req, res){
 // En req.body tenemos: {'pregunta': "...", 'opciones[]': ["...", "..."]},
 // pregunta no debe ser vacía y opciones tiene que tener por lo menos dos elementos,
 // además todos los elementos de opciones deben ser no vacíos.
-
+// No permitir que el mismo usuario cree una nueva encuesta con la misma pregunta que otra que ya haya creado (y no borrado).
 exports.crearEncuesta_post = function(req, res, next) {
   console.log("POST: CREA ENCUESTA.");
   let usuario_logueado = req.user;
   if (req.body.pregunta.length >= 2){
     // Antes de esto hay que validar los datos
+    // Chequear si ya existe una encuesta del mismo usuario con la misma pregunta
     let nueva_encuesta = new Encuesta(nuevaEncuesta(req.body));
     // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
     nueva_encuesta.creador = usuario_logueado.local.username;
