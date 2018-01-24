@@ -81,6 +81,18 @@ input[type="radio"] {
   text-align: center;
 }
 
+/* Columnas de la misma altura en bootstrap */
+/* from an article by Carol Skelly: Bootstrap Equal Height Columns
+https://medium.com/wdstack/bootstrap-equal-height-columns-d07bc934eb27
+*/
+.row.display-flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+.row.display-flex > [class*='col-'] {
+  display: flex;
+  flex-direction: column;
+}
 
 /* Media queries */
 
@@ -94,7 +106,6 @@ input[type="radio"] {
   .nav li {
     display: inline;
   }
-
 }
 
 @media screen and (min-width: 770px) {
@@ -102,5 +113,4 @@ input[type="radio"] {
     float: left;
     display: block;
   }
-
 }
