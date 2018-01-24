@@ -30,70 +30,28 @@ $(document).ready(function(){
     let datos = {pregunta: pregunta, opciones: opciones};
     // Hago un pedido post
     /*
-    No sé por qué después de crear la encuesta no se redirige a otra página.
-    No entiendo por qué funciona en el caso de borrar una encuesta y acá no.
-    Inmediatamente después de mostrar una de las alertas vuelve a la misma página de crear encuesta y sí aparece el mensaje flash de que la encuesta fue creada.
-    PARECERÍA SOLUCIONADO:
-    Cambios que realicé:
     - en vez del evento submit del formulario usé el evento click del botón de submit
     - después del ajax request usé event.preventDefault()
     Entonces, después de haberse creado con éxito una encuesta, se redirige a la página indicada en la función correspondiente a success.
+    Y si hay un error (como por ejemplo ¿clickear el botón sin haber completado antes el formulario?) entonces vuelve a rearEncuesta.
+    ¿Cómo hacer para que se vea un mensaje en la página que haga referencia al error?
      */
     $.ajax({
       type: 'POST',
-      url: appUrl + '/' + usuario + '/crearEncuesta' ,
+      url: appUrl + '/' + usuario + '/crearEncuesta',
       data: datos,
       success: function(data, status){
-        // alert('¡Encuesta creada, ' + usuario + '!');
+        // Por ahora dejo los alert para ver por qué lado viene la respuesta.
+        alert('¡Encuesta creada, ' + usuario + '!');
         window.location.href= appUrl + '/' + usuario;
       },
       error:  function(data) {
-        // alert('Status: ' + data.status);
-        window.location.href= '/';
+        alert('Error status: ' + data.status);
+        // window.location.href= appUrl + '/' + usuario + '/crearEncuesta';
+        // No me gusta esta solución...
+        // $('#mensajeError').append("SE PRODUJO ALGÚN TIPO DE ERROR");
       }
     }); // ajax post
-
-    /*$.post(appUrl + '/' + usuario + '/crearEncuesta', datos, function(data, status){
-        //alert('Status: ' + status);
-        $.get(appUrl + '/' + usuario, function(data) {
-          alert('¡Encuesta creada, ' + usuario + '!');
-        });
-    }); // ajax post*/
     event.preventDefault();
   }); // form
-
-/*
-  $('form').on('submit', function(event){
-    // Obtengo la pregunta
-    let pregunta = $('input[name="pregunta"]').val();
-    let usuario = $('input[name="usuario"]').val();
-    // Obtengo las opciones
-    let opciones = $('input').filter('.opcion').toArray();
-    opciones = opciones.map(function(op) { return op.value; });
-    let datos = {pregunta: pregunta, opciones: opciones};
-    // Hago un pedido post
-    // Uso window.location.pathname porque el formulario está en /:username/crearEncuesta y es ahí, con :username reemplazado por el usuario logueado que tenés que ir
-    $.ajax(appUrl + '/' + usuario + '/crearEncuesta', {
-      type: 'POST',
-      data: datos,
-      success: function(data, status){
-        if (status === 'error') {
-          window.location.href='/horror';
-        } else {
-        // Ir a la página de encuestas
-        alert('Voy a la página de encuestas')
-          window.location.href='/';
-        }
-      },
-      error:  function(data) {
-        // alert('Error en el pedido post. ');
-        // alert(data);
-        // Volver a la página de crear encuestas
-        //window.location.href= appUrl + window.location.pathname;
-        alert('Status: ' + data.status);
-        window.location.href= appUrl + '/' + usuario
-      }
-    }); // ajax post
-  }); // form
-*/
 });

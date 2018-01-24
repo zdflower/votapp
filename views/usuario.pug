@@ -17,7 +17,7 @@ block content
                   h4
                     a(href= encuesta.url)= encuesta.pregunta
                     // - a.btn.btn-sm.btn-success(href= encuesta.url) Comparte la encuesta
-                    span= ' (' + encuesta.fechaConFormato + ')'
+                    span= ' (' + encuesta.fecha + ')'
                 .panel-body
                   h5 Opción más votada: #{encuesta.opMasVotada.op} (#{encuesta.opMasVotada.votos} votos de un total de #{encuesta.totalVotos}),
                 .panel-footer.text-right
