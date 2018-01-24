@@ -17,6 +17,7 @@
 - [ ] mLab online database
 - [ ] Add form validation.
 - [ ] Use cdn links for bootstrap, jquery, chart.js, fontawesome.
+- [ ] Ask twice before deleting a poll (instead of deleting it inmediately after clicking the button).
 
 ## Comments
 
@@ -43,10 +44,12 @@ There are many sources that helped me learn, understand various aspects of the p
 * https://www.w3schools.com/jquery/jquery_ref_ajax.asp
 * https://caolan.github.io/async/docs.html
 * https://github.com/bocoup/jqfundamentals.com
+* Eloquent Javascript http://eloquentjavascript.net
 * etc.
 
 ## Other Comments
 
 * For the moment anyone can vote any number of times.
 * You can share a poll by copying the link of that poll's page.
-* I would like to improve the design of the pages, in particular the user's page.
+* I would like to improve the design of the pages.
+* The order of the polls in the user page is from the oldest to the newest.
