@@ -44,11 +44,11 @@ $(document).ready(function(){
       url: appUrl + '/' + usuario + '/crearEncuesta' ,
       data: datos,
       success: function(data, status){
-        alert('¡Encuesta creada, ' + usuario + '!');
+        // alert('¡Encuesta creada, ' + usuario + '!');
         window.location.href= appUrl + '/' + usuario;
       },
       error:  function(data) {
-        alert('Status: ' + data.status);
+        // alert('Status: ' + data.status);
         window.location.href= '/';
       }
     }); // ajax post
