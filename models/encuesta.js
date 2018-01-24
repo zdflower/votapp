@@ -1,5 +1,5 @@
 'use strict';
-
+const moment = require('moment')
 let mongoose = require('mongoose');
 
 let EncuestaSchema = mongoose.Schema({
@@ -8,7 +8,8 @@ let EncuestaSchema = mongoose.Schema({
     op: {type: String, required: true, min: 2, max: 100},
     votos: {type: Number}
   }],
-  creador : {type: String, required: true, min: 2, max: 100}
+  creador : {type: String, required: true, min: 2, max: 100},
+  fecha : {type: Date, default: Date.now}
 });
 
 // El nombre de usuario debe ser único.
@@ -34,6 +35,10 @@ EncuestaSchema.virtual('totalVotos').get(function(){
     resultado += op.votos;
   });
   return resultado;
+});
+
+EncuestaSchema.virtual('fechaConFormato').get(function(){
+  return moment(this.fecha).format('MMMM Do, YYYY');
 });
 
 module.exports = mongoose.model('Encuesta', EncuestaSchema);

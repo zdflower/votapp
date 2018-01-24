@@ -6,5 +6,6 @@ block content
       each encuesta, i in encuestas
         li.list-group-item
           a(href= encuesta.url)= encuesta.pregunta
+          span= ' (' + encuesta.fechaConFormato + ')'
   else
     p No hay encuestas aún

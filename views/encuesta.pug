@@ -5,7 +5,7 @@ block content
       .panel.panel-success
         .panel-heading
           h2= '¿' + encuesta.pregunta + '?'
-            small= '  ' + encuesta.creador
+            small= '  ' + encuesta.creador + ' (' + encuesta.fechaConFormato + ')'
         .panel-body
           form(method="post", action= encuesta.url)
             each opcion, i in encuesta.opciones

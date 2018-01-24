@@ -52,4 +52,4 @@ There are many sources that helped me learn, understand various aspects of the p
 * For the moment anyone can vote any number of times.
 * You can share a poll by copying the link of that poll's page.
 * I would like to improve the design of the pages.
-* The order of the polls in the user page is from the oldest to the newest.
+* The polls have date of creation (for now, in english).
