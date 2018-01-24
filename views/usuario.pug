@@ -16,10 +16,13 @@ block content
                 .panel-heading
                   h4
                     a(href= encuesta.url)= encuesta.pregunta
-                  // - a.btn.btn-sm.btn-success(href= encuesta.url) Comparte la encuesta
+                    // - a.btn.btn-sm.btn-success(href= encuesta.url) Comparte la encuesta
+                    span= ' (' + encuesta.fechaConFormato + ')'
                 .panel-body
                   h5 Opción más votada: #{encuesta.opMasVotada.op} (#{encuesta.opMasVotada.votos} votos de un total de #{encuesta.totalVotos}),
+                .panel-footer.text-right
                   if usuario.local.username == encuesta.creador
-                    button.btn.btn-sm.btn-warning.borrar_encuesta(href="#" data-id= encuesta.url) Borrar la encuesta
+                    p.text-danger ¡Cuidado! #{' '}
+                      button.btn.btn-sm.btn-danger.borrar_encuesta(href="#" data-id= encuesta.url) Borrar la encuesta
   // - hr
   // - a.btn.btn-danger.borrar-usuario(href='#', data-id=id) Eliminar cuenta de usuario

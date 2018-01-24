@@ -81,6 +81,14 @@ input[type="radio"] {
   text-align: center;
 }
 
+.panel-footer {
+  padding: 5px 5px 5px 15px;
+}
+.panel-footer p {
+  font-size: 0.7em;
+  margin-bottom: 0;
+}
+
 /* Columnas de la misma altura en bootstrap */
 /* from an article by Carol Skelly: Bootstrap Equal Height Columns
 https://medium.com/wdstack/bootstrap-equal-height-columns-d07bc934eb27
