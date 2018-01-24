@@ -23,12 +23,34 @@ $(document).ready(function(){
   $('form').on('submit', function(event){
     // Obtengo la pregunta
     let pregunta = $('input[name="pregunta"]').val();
+    let usuario = $('input[name="usuario"]').val();
     // Obtengo las opciones
     let opciones = $('input').filter('.opcion').toArray();
     opciones = opciones.map(function(op) { return op.value; });
     let datos = {pregunta: pregunta, opciones: opciones};
     // Hago un pedido post
-    $.ajax(appUrl + '/:username/crearEncuesta', {
+    // Uso window.location.pathname porque el formulario está en /:username/crearEncuesta y es ahí, con :username reemplazado por el usuario logueado que tenés que ir
+    $.post(appUrl + '/' + usuario + '/crearEncuesta', datos, function(data, status){
+        //alert('Status: ' + status);
+        $.get(appUrl + '/' + usuario, function(data) {
+          alert('¡Encuesta creada, ' + usuario + '!');
+        });
+    }); // ajax post
+    event.preventDefault();
+  }); // form
+
+/*
+  $('form').on('submit', function(event){
+    // Obtengo la pregunta
+    let pregunta = $('input[name="pregunta"]').val();
+    let usuario = $('input[name="usuario"]').val();
+    // Obtengo las opciones
+    let opciones = $('input').filter('.opcion').toArray();
+    opciones = opciones.map(function(op) { return op.value; });
+    let datos = {pregunta: pregunta, opciones: opciones};
+    // Hago un pedido post
+    // Uso window.location.pathname porque el formulario está en /:username/crearEncuesta y es ahí, con :username reemplazado por el usuario logueado que tenés que ir
+    $.ajax(appUrl + '/' + usuario + '/crearEncuesta', {
       type: 'POST',
       data: datos,
       success: function(data, status){
@@ -36,16 +58,19 @@ $(document).ready(function(){
           window.location.href='/horror';
         } else {
         // Ir a la página de encuestas
+        alert('Voy a la página de encuestas')
           window.location.href='/';
         }
       },
       error:  function(data) {
-        alert('Error en el pedido post. ');
-        alert(data);
+        // alert('Error en el pedido post. ');
+        // alert(data);
         // Volver a la página de crear encuestas
-        window.location.href= appUrl + '/:username/crearEncuesta';
+        //window.location.href= appUrl + window.location.pathname;
+        alert('Status: ' + data.status);
+        window.location.href= appUrl + '/' + usuario
       }
     }); // ajax post
   }); // form
-
+*/
 });
