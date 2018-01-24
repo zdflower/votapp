@@ -38,13 +38,13 @@ exports.perfilUsuario = function (req, res, next){
   }, function(err, results) {
     if (err) { return next(err); } // Error in API usage.
     if (results.usuario == null) { // No results.
-      var err = new Error('Usuario no encontrado');
+      var err = new Error('Página no encontrada'); // Usuario no encontrado
       err.status = 404;
       return next(err);
     }
     if (results.encuestas_usuario == null){
       console.log("Ninguna encuesta");
-      var err = new Error('Encuesta no encontrada');
+      var err = new Error('Página no encontrada'); // Encuesta no encontrada
       err.status = 404;
       return next(err);
     }

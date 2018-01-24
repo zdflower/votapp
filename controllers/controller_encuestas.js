@@ -34,7 +34,7 @@ exports.obtenerEncuesta = function(req, res, next) {
         }
       } else {
         // res.send('No existe la encuesta');
-        const error = new Error('No existe la encuesta');
+        const error = new Error('No existe la página');
         error.status = 404;
         next(error);
       }
