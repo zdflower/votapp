@@ -20,7 +20,7 @@ $(document).ready(function(){
     });
   });
 
-  $('form').on('submit', function(event){
+  $('#btnCrearEncuesta').on('click', function(event){
     // Obtengo la pregunta
     let pregunta = $('input[name="pregunta"]').val();
     let usuario = $('input[name="usuario"]').val();
@@ -29,13 +29,36 @@ $(document).ready(function(){
     opciones = opciones.map(function(op) { return op.value; });
     let datos = {pregunta: pregunta, opciones: opciones};
     // Hago un pedido post
-    // Uso window.location.pathname porque el formulario está en /:username/crearEncuesta y es ahí, con :username reemplazado por el usuario logueado que tenés que ir
-    $.post(appUrl + '/' + usuario + '/crearEncuesta', datos, function(data, status){
+    /*
+    No sé por qué después de crear la encuesta no se redirige a otra página.
+    No entiendo por qué funciona en el caso de borrar una encuesta y acá no.
+    Inmediatamente después de mostrar una de las alertas vuelve a la misma página de crear encuesta y sí aparece el mensaje flash de que la encuesta fue creada.
+    PARECERÍA SOLUCIONADO:
+    Cambios que realicé:
+    - en vez del evento submit del formulario usé el evento click del botón de submit
+    - después del ajax request usé event.preventDefault()
+    Entonces, después de haberse creado con éxito una encuesta, se redirige a la página indicada en la función correspondiente a success.
+     */
+    $.ajax({
+      type: 'POST',
+      url: appUrl + '/' + usuario + '/crearEncuesta' ,
+      data: datos,
+      success: function(data, status){
+        alert('¡Encuesta creada, ' + usuario + '!');
+        window.location.href= appUrl + '/' + usuario;
+      },
+      error:  function(data) {
+        alert('Status: ' + data.status);
+        window.location.href= '/';
+      }
+    }); // ajax post
+
+    /*$.post(appUrl + '/' + usuario + '/crearEncuesta', datos, function(data, status){
         //alert('Status: ' + status);
         $.get(appUrl + '/' + usuario, function(data) {
           alert('¡Encuesta creada, ' + usuario + '!');
         });
-    }); // ajax post
+    }); // ajax post*/
     event.preventDefault();
   }); // form
 
