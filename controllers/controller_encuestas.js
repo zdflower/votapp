@@ -92,7 +92,8 @@ exports.crearEncuesta_post = function(req, res, next) {
       if (resultado) {
         console.log('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
         req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
-        let error = new Error();
+        const error = new Error('Ya existe una encuesta con la pregunta: "' + preg + '"');
+        error.status = 400;
         // quizá en vez de err sea error... Sí, eso lo solucionó.
         return next(error);//res.send(error);
         /*
@@ -153,7 +154,8 @@ TypeError: Cannot read property 'opciones' of null
           else {
             console.log('Devolviendo ERROR: Las opciones debeb tener al menos 2 caracteres.');
             req.flash('error', 'ERROR: Las opciones deben tener al menos 2 caracteres.');
-            let err = new Error();
+            let err = new Error('ERROR: Las opciones deben tener al menos 2 caracteres.');
+            err.status = 400;
             return next(err);// res.send(err);
           }
         } // end if hay un mínimo de 2 opciones
@@ -161,7 +163,8 @@ TypeError: Cannot read property 'opciones' of null
           // creo que esto está de más, ya que siempre hay dos opciones, aunque estén vacías.
           console.log('ERROR: Debe haber un mínimo de dos opciones.');
           req.flash('error', 'ERROR: Debe haber un mínimo de dos opciones.');
-          let err = new Error();
+          let err = new Error('ERROR: Debe haber un mínimo de dos opciones.');
+          err.status = 400;
           return next(err);// res.send(err);
         }
       }
@@ -173,7 +176,8 @@ TypeError: Cannot read property 'opciones' of null
       // Si hago lo siguiente es como mandarle ok en respuesta al pedido ajax y entonces en vez de redirigirme a crear encuesta ejecuta la función correspondiente a success.
       // En realidad sí se redirige a crearEncuesta, y seguramente muestra el mensaje flash, pero inmediatamente, tan rápido que ni se ve en el navegador, ejecuta la función sucess que te lleva al perfil del usuario.
       // res.redirect(usuario_logueado.url + '/crearEncuesta');
-      let err = new Error();
+      let err = new Error('ERROR: La pregunta debe tener al menos 2 caracteres.');
+      err.status = 400;
       return next(err);// res.send(err);
   }
 }; // fin crearEncuesta_post
