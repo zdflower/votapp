@@ -80,29 +80,56 @@ exports.crearEncuesta_post = function(req, res, next) {
   // Validación... (más adelante, tal vez, usar express-validator )
   // La pregunta debe tener al menos dos caracteres
   if (preg.length >= 2){
-    // Debe haber al menos 2 opciones
-    if (opciones.length >= 2) {
-      // Cada opción debe tener al menos 2 caracteres
-      let todasLasOpcionesMin2Caracteres = opciones.every(function(op){
-        return op.length >= 2;
-      });
-      if (todasLasOpcionesMin2Caracteres){
-        // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
-        Encuesta.findOne({pregunta: preg, creador: usuario_logueado.local.username}, function(err, resultado){
-          if (err){
-            console.log("Error: " + err);
-            req.flash('error', 'Algo salió mal al buscar la encuesta.');
-            res.send(err);
-          }
-          console.log('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
-          if (resultado) {
-            console.log('Aparentemente habría una encuesta del mismo usuario con esa pregunta');
-            console.log('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
-            req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
-            let error = new Error();
-            return next(err);//res.send(error); // Es como si nada..., como si respondiera todo bien!
-          } else {
-            console.log('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
+    // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
+    Encuesta.findOne({pregunta: preg, creador: usuario_logueado.local.username}, function(err, resultado){
+      if (err){
+        console.log("Error: " + err);
+        req.flash('error', 'Algo salió mal al buscar la encuesta.');
+        res.send(err);
+      }
+      // No hubo error en la búsqueda.
+      console.log('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
+      if (resultado) {
+        console.log('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
+        req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
+        let error = new Error();
+        // quizá en vez de err sea error... Sí, eso lo solucionó.
+        return next(error);//res.send(error);
+        /*
+        Este error se generaba porqeu en vez de return next(error) yo había escrito return next(err)...
+        POST: CREA ENCUESTA.
+Descartando signos de interrogación.
+Usuario: FDZ
+Pregunta: what is your favorite animal
+Resultado de la búsqueda de una encuesta repetida: { opciones:
+   [ { op: 'cat', votos: 2, _id: 5a63bb3d4de380163abaacd4 },
+     { op: 'dog', votos: 0, _id: 5a63bb3d4de380163abaacd3 },
+     { op: 'bird', votos: 0, _id: 5a63bb3d4de380163abaacd2 },
+     { op: 'tortoise', votos: 0, _id: 5a63bb3d4de380163abaacd1 },
+     { op: 'gecko', votos: 1, _id: 5a63bb3d4de380163abaacd0 },
+     { op: 'elephant', votos: 0, _id: 5a63bb3d4de380163abaaccf } ],
+  fecha: 2018-01-25T15:12:15.106Z,
+  _id: 5a63bb3d4de380163abaacce,
+  creador: 'FDZ',
+  pregunta: 'what is your favorite animal',
+  __v: 0 }
+ERROR: Ya existe una encuesta con la pregunta: "what is your favorite animal"
+events.js:136
+      throw er; // Unhandled 'error' event
+      ^
+
+TypeError: Cannot read property 'opciones' of null
+    at /home/flor/workspace-web/votapp/controllers/controller_encuestas.js:160:42
+
+        */
+      } else {
+        console.log('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
+        // Debe haber al menos 2 opciones
+        if (opciones.length >= 2) {
+          // Cada opción debe tener al menos 2 caracteres
+          let todasLasOpcionesMin2Caracteres = opciones.every(function(op){return op.length >= 2;});
+          if (todasLasOpcionesMin2Caracteres){
+            // Llegado acá, se cumplen todas las condiciones para crear la encuesta.
             // Creo la nueva encuesta y la guardo.
             // Acá está el problema de los signos de interrogación: como paso req.body, no usa la pregunta sin signos de interrogación, sino la original.
             // Le paso además del body la pregunta sin los signos de interrogación, por lo menos hasta que sepa si se puede (y cómo) modificar req.body.pregunta y así pasarle sólo req.body, o hasta que encuentre una solución mejor.
@@ -121,34 +148,35 @@ exports.crearEncuesta_post = function(req, res, next) {
               // si no hubo error llegamos acá, si hubo error, creo que no llegás acá.
               req.flash('success', 'Encuesta creada');
               res.send('Ok');
-            });
+            }); // fin guardado de encuesta
+          } // fin if todasLasOpcionesMin2Caracteres
+          else {
+            console.log('Devolviendo ERROR: Las opciones debeb tener al menos 2 caracteres.');
+            req.flash('error', 'ERROR: Las opciones deben tener al menos 2 caracteres.');
+            let err = new Error();
+            return next(err);// res.send(err);
           }
-        });
-      } // fin if todasLasOpcionesMin2Caracteres
-      else {
-        console.log('Devolviendo ERROR: Las opciones debeb tener al menos 2 caracteres.');
-        req.flash('error', 'ERROR: Las opciones deben tener al menos 2 caracteres.');
-        let err = new Error();
-        return next(err);// res.send(err);
+        } // end if hay un mínimo de 2 opciones
+        else {
+          // creo que esto está de más, ya que siempre hay dos opciones, aunque estén vacías.
+          console.log('ERROR: Debe haber un mínimo de dos opciones.');
+          req.flash('error', 'ERROR: Debe haber un mínimo de dos opciones.');
+          let err = new Error();
+          return next(err);// res.send(err);
+        }
       }
-    } // end if hay un mínimo de 2 opciones
-    else {
-      // creo que esto está de más, ya que siempre hay dos opciones, aunque estén vacías.
-      console.log('ERROR: Debe haber un mínimo de dos opciones.');
-      req.flash('error', 'ERROR: Debe haber un mínimo de dos opciones.');
+    }); // fin búsqueda encuesta
+  }
+  else {
+      console.log('ERROR: La pregunta debe tener al menos 2 caracteres.');
+      req.flash('error', 'ERROR: La pregunta debe tener al menos 2 caracteres.');
+      // Si hago lo siguiente es como mandarle ok en respuesta al pedido ajax y entonces en vez de redirigirme a crear encuesta ejecuta la función correspondiente a success.
+      // En realidad sí se redirige a crearEncuesta, y seguramente muestra el mensaje flash, pero inmediatamente, tan rápido que ni se ve en el navegador, ejecuta la función sucess que te lleva al perfil del usuario.
+      // res.redirect(usuario_logueado.url + '/crearEncuesta');
       let err = new Error();
       return next(err);// res.send(err);
-    }
-  } else {
-    console.log('ERROR: La pregunta debe tener al menos 2 caracteres.');
-    req.flash('error', 'ERROR: La pregunta debe tener al menos 2 caracteres.');
-    // Si hago lo siguiente es como mandarle ok en respuesta al pedido ajax y entonces en vez de redirigirme a crear encuesta ejecuta la función correspondiente a success.
-    // En realidad sí se redirige a crearEncuesta, y seguramente muestra el mensaje flash, pero inmediatamente, tan rápido que ni se ve en el navegador, ejecuta la función sucess que te lleva al perfil del usuario.
-    // res.redirect(usuario_logueado.url + '/crearEncuesta');
-    let err = new Error();
-    return next(err);// res.send(err);
   }
-};
+}; // fin crearEncuesta_post
 
 exports.votarEncuesta = function(req, res, next) {
   var filtro = {'pregunta': req.params.pregunta, 'creador': req.params.username};
