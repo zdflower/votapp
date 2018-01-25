@@ -52,68 +52,93 @@ exports.crearEncuesta_get = function(req, res){
 // pregunta no debe ser vacía y opciones tiene que tener por lo menos dos elementos,
 // además todos los elementos de opciones deben ser no vacíos.
 // No permitir que el mismo usuario cree una nueva encuesta con la misma pregunta que otra que ya haya creado (y no borrado).
+
+/*
+Casos de error:
+  Clickeo el botón de crear encuesta
+    1)  sin completar ni la pregunta ni las opciones.
+    2) completando la pregunta pero no las opciones
+      2.1) la pregunta es nueva
+      2.2) la pregunta es repetida
+
+Lo que sucede:
+  2.1) Se interrumpe el servidor después de obtener un error al intentar guardar la encuesta:
+        throw er; // Unhandled 'error' event
+        ^
+
+  Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+
+  1) y 2.2) Sale de crearEncuesta_post y vuelve al ajax por el lado del success, pero muestra el mensaje flash de error correspondiente.
+*/
+
 exports.crearEncuesta_post = function(req, res, next) {
   console.log("POST: CREA ENCUESTA.");
   let usuario_logueado = req.user;
   let preg = descartarSignosInterrogacion(req.body.pregunta);
-  /*
-  Casos de error:
-    Clickeo el botón de crear encuesta
-      1)  sin completar ni la pregunta ni las opciones.
-      2) completando la pregunta pero no las opciones
-        2.1) la pregunta es nueva
-        2.2) la pregunta es repetida
-
-  Lo que sucede:
-    2.1) Se interrumpe el servidor después de obtener un error al intentar guardar la encuesta:
-          throw er; // Unhandled 'error' event
-          ^
-
-    Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
-
-    1) y 2.2) Sale de crearEncuesta_post y vuelve al ajax por el lado del success, pero muestra el mensaje flash de error correspondiente.
-  */
-
+  let opciones = req.body["opciones[]"];
   console.log('Usuario: ' + usuario_logueado.local.username + '\nPregunta: ' + preg);
+  // Validación... (más adelante, tal vez, usar express-validator )
+  // La pregunta debe tener al menos dos caracteres
   if (preg.length >= 2){
-    // Antes de esto hay que validar los datos
-    // Chequo si ya existe una encuesta del mismo usuario con la misma pregunta
-    Encuesta.findOne({pregunta: preg, creador: usuario_logueado.local.username}, function(err, resultado){
-      if (err){
-        console.log("Error: " + err);
-        req.flash('error', 'Algo salió mal al buscar la encuesta.');
-        res.send(err);
-      }
-      console.log('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
-      if (resultado) {
-        console.log('Aparentemente habría una encuesta del mismo usuario con esa pregunta');
-        console.log('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
-        req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
-        let error = new Error();
-        res.send(error); // Es como si nada..., como si respondiera todo bien!
-      } else {
-        console.log('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
-        // Creo la nueva encuesta y la guardo.
-        // Acá está el problema de los signos de interrogación: como paso req.body, no usa la pregunta sin signos de interrogación, sino la original.
-        // Le paso además del body la pregunta sin los signos de interrogación, por lo menos hasta que sepa si se puede (y cómo) modificar req.body.pregunta y así pasarle sólo req.body, o hasta que encuentre una solución mejor.
-        let nueva_encuesta = new Encuesta(nuevaEncuesta(preg, req.body));
-        // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
-        nueva_encuesta.creador = usuario_logueado.local.username;
-        console.log("nueva_encuesta: ");
-        console.log(nueva_encuesta);
-        // TENGO QUE CHEQUEAR QUE ESTÉN COMPLETOS LOS CAMPOS REQUERIDOS POR EL ESQUEMA DE ENCUESTA, SINO TIRA ERROR.
-        nueva_encuesta.save(function (err) {
-          if (err) {
-            console.log("Error guardando encuesta.");
-            req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
+    // Debe haber al menos 2 opciones
+    if (opciones.length >= 2) {
+      // Cada opción debe tener al menos 2 caracteres
+      let todasLasOpcionesMin2Caracteres = opciones.every(function(op){
+        return op.length >= 2;
+      });
+      if (todasLasOpcionesMin2Caracteres){
+        // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
+        Encuesta.findOne({pregunta: preg, creador: usuario_logueado.local.username}, function(err, resultado){
+          if (err){
+            console.log("Error: " + err);
+            req.flash('error', 'Algo salió mal al buscar la encuesta.');
             res.send(err);
           }
-          // si no hubo error llegamos acá, si hubo error, creo que no llegás acá.
-          req.flash('success', 'Encuesta creada');
-          res.send('Ok');
+          console.log('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
+          if (resultado) {
+            console.log('Aparentemente habría una encuesta del mismo usuario con esa pregunta');
+            console.log('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
+            req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
+            let error = new Error();
+            return next(err);//res.send(error); // Es como si nada..., como si respondiera todo bien!
+          } else {
+            console.log('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
+            // Creo la nueva encuesta y la guardo.
+            // Acá está el problema de los signos de interrogación: como paso req.body, no usa la pregunta sin signos de interrogación, sino la original.
+            // Le paso además del body la pregunta sin los signos de interrogación, por lo menos hasta que sepa si se puede (y cómo) modificar req.body.pregunta y así pasarle sólo req.body, o hasta que encuentre una solución mejor.
+            let nueva_encuesta = new Encuesta(nuevaEncuesta(preg, req.body));
+            // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
+            nueva_encuesta.creador = usuario_logueado.local.username;
+            console.log("nueva_encuesta: ");
+            console.log(nueva_encuesta);
+            // TENGO QUE CHEQUEAR QUE ESTÉN COMPLETOS LOS CAMPOS REQUERIDOS POR EL ESQUEMA DE ENCUESTA, SINO TIRA ERROR.
+            nueva_encuesta.save(function (err) {
+              if (err) {
+                console.log("Error guardando encuesta.");
+                req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
+                res.send(err);
+              }
+              // si no hubo error llegamos acá, si hubo error, creo que no llegás acá.
+              req.flash('success', 'Encuesta creada');
+              res.send('Ok');
+            });
+          }
         });
+      } // fin if todasLasOpcionesMin2Caracteres
+      else {
+        console.log('Devolviendo ERROR: Las opciones debeb tener al menos 2 caracteres.');
+        req.flash('error', 'ERROR: Las opciones deben tener al menos 2 caracteres.');
+        let err = new Error();
+        return next(err);// res.send(err);
       }
-    });
+    } // end if hay un mínimo de 2 opciones
+    else {
+      // creo que esto está de más, ya que siempre hay dos opciones, aunque estén vacías.
+      console.log('ERROR: Debe haber un mínimo de dos opciones.');
+      req.flash('error', 'ERROR: Debe haber un mínimo de dos opciones.');
+      let err = new Error();
+      return next(err);// res.send(err);
+    }
   } else {
     console.log('ERROR: La pregunta debe tener al menos 2 caracteres.');
     req.flash('error', 'ERROR: La pregunta debe tener al menos 2 caracteres.');
@@ -121,7 +146,7 @@ exports.crearEncuesta_post = function(req, res, next) {
     // En realidad sí se redirige a crearEncuesta, y seguramente muestra el mensaje flash, pero inmediatamente, tan rápido que ni se ve en el navegador, ejecuta la función sucess que te lleva al perfil del usuario.
     // res.redirect(usuario_logueado.url + '/crearEncuesta');
     let err = new Error();
-    res.send(err);
+    return next(err);// res.send(err);
   }
 };
 
