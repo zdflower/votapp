@@ -55,19 +55,25 @@ exports.crearEncuesta_get = function(req, res){
 exports.crearEncuesta_post = function(req, res, next) {
   console.log("POST: CREA ENCUESTA.");
   let usuario_logueado = req.user;
-  // let preg = req.body.pregunta;
-  // console.log('Usuario: ' + usuario + '\nPregunta: ' + preg);
-  // ¿El problema era intentar acceder a req.body.pregunta y no estaba ese campo completado? ¿?
-  // Parece que el problema tenía que ver con eso, porque ahora la ejecución sigue y por consola devuelve
+  let preg = descartarSignosInterrogacion(req.body.pregunta);
   /*
-  No sé cuál es el error ahora.
+  Casos de error:
+    Clickeo el botón de crear encuesta
+      1)  sin completar ni la pregunta ni las opciones.
+      2) completando la pregunta pero no las opciones
+        2.1) la pregunta es nueva
+        2.2) la pregunta es repetida
+
+  Lo que sucede:
+    2.1) Se interrumpe el servidor después de obtener un error al intentar guardar la encuesta:
+          throw er; // Unhandled 'error' event
+          ^
+
+    Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+
+    1) y 2.2) Sale de crearEncuesta_post y vuelve al ajax por el lado del success, pero muestra el mensaje flash de error correspondiente.
   */
-  let preg = descartarSignosInterrogacion(req.body.pregunta); // Hasta acá todo bien, la siguiente línea no la ejecuta.
-  // Voy a ver si en vez de usuario es usuario_logueado.local.username...
-  // Parece que tenía que ver con eso porque ahora el funcionamiento es distinto, ya no obtengo error status 500,
-  // pero todavía no funciona completamente como debería.
-  // Casi funciona, el problema es que aunque encuentra una encuesta repetida responde con 200 al pedido ajax en vez de con error,
-  // por lo tanto se ejecuta la función success, lo que sí es que se muestra el mensaje flash de error...
+
   console.log('Usuario: ' + usuario_logueado.local.username + '\nPregunta: ' + preg);
   if (preg.length >= 2){
     // Antes de esto hay que validar los datos
@@ -83,19 +89,14 @@ exports.crearEncuesta_post = function(req, res, next) {
         console.log('Aparentemente habría una encuesta del mismo usuario con esa pregunta');
         console.log('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
         req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
-        // Redirijo a la página del usuario para que pueda ver la encuesta existente y en todo caso borrarla si quiere hacer una nueva.
-        // res.redirect(usuario_logueado.url);
         let error = new Error();
         res.send(error); // Es como si nada..., como si respondiera todo bien!
       } else {
-      /*
-        Traté de crear una encuesta con la misma pregunta y me lo permitió...
-        No debió suceder.
-        Voy a explorar qué pasó.
-      */
         console.log('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
         // Creo la nueva encuesta y la guardo.
-        let nueva_encuesta = new Encuesta(nuevaEncuesta(req.body));
+        // Acá está el problema de los signos de interrogación: como paso req.body, no usa la pregunta sin signos de interrogación, sino la original.
+        // Le paso además del body la pregunta sin los signos de interrogación, por lo menos hasta que sepa si se puede (y cómo) modificar req.body.pregunta y así pasarle sólo req.body, o hasta que encuentre una solución mejor.
+        let nueva_encuesta = new Encuesta(nuevaEncuesta(preg, req.body));
         // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
         nueva_encuesta.creador = usuario_logueado.local.username;
         console.log("nueva_encuesta: ");
@@ -103,42 +104,7 @@ exports.crearEncuesta_post = function(req, res, next) {
         // TENGO QUE CHEQUEAR QUE ESTÉN COMPLETOS LOS CAMPOS REQUERIDOS POR EL ESQUEMA DE ENCUESTA, SINO TIRA ERROR.
         nueva_encuesta.save(function (err) {
           if (err) {
-            console.log("Error guardando encuesta."); // Otro bug: Cuando no completo las opciones llega hasta acá y después se mostró en el navegador el alert: "Error status: 0" y luego en la consola:
-            /*
-Resultado de la búsqueda de una encuesta repetida: null
-Aparentemente NO habría una encuesta del mismo usuario con esa pregunta
-Nueva encuesta.
-nueva_encuesta:
-{ opciones:
-   [ { _id: 5a69142b8d73293edb473ab9, op: '', votos: 0 },
-     { _id: 5a69142b8d73293edb473ab8, op: '', votos: 0 } ],
-  fecha: 2018-01-24T23:18:03.954Z,
-  _id: 5a69142b8d73293edb473ab7,
-  pregunta: 'qué carajos pasa',
-  creador: 'Florencia' }
-Error guardando encuesta.
-events.js:136
-      throw er; // Unhandled 'error' event
-      ^
-
-Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
-    at validateHeader (_http_outgoing.js:503:11)
-    at ServerResponse.setHeader (_http_outgoing.js:510:3)
-    at ServerResponse.header (/home/flor/web-wrkspc/votapp-github/votapp/node_modules/express/lib/response.js:767:10)
-    at ServerResponse.send (/home/flor/web-wrkspc/votapp-github/votapp/node_modules/express/lib/response.js:170:12)
-    at /home/flor/web-wrkspc/votapp-github/votapp/controllers/controller_encuestas.js:111:15
-    at /home/flor/web-wrkspc/votapp-github/votapp/node_modules/mongoose/lib/model.js:3913:16
-    at $__save.error (/home/flor/web-wrkspc/votapp-github/votapp/node_modules/mongoose/lib/model.js:340:16)
-    at /home/flor/web-wrkspc/votapp-github/votapp/node_modules/kareem/index.js:246:48
-    at next (/home/flor/web-wrkspc/votapp-github/votapp/node_modules/kareem/index.js:167:27)
-    at Kareem.execPost (/home/flor/web-wrkspc/votapp-github/votapp/node_modules/kareem/index.js:217:3)
-    at _handleWrapError (/home/flor/web-wrkspc/votapp-github/votapp/node_modules/kareem/index.js:245:21)
-    at /home/flor/web-wrkspc/votapp-github/votapp/node_modules/kareem/index.js:271:14
-    at _next (/home/flor/web-wrkspc/votapp-github/votapp/node_modules/kareem/index.js:94:14)
-    at Immediate.setImmediate (/home/flor/web-wrkspc/votapp-github/votapp/node_modules/kareem/index.js:420:34)
-    at runCallback (timers.js:773:18)
-    at tryOnImmediate (timers.js:734:5)
-*/
+            console.log("Error guardando encuesta.");
             req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
             res.send(err);
           }
@@ -232,16 +198,18 @@ function descartarSignosInterrogacion(pregunta) {
 
 // data =  {'pregunta': "...", 'opciones[]': ["...", "..."]}
 // La pregunta ya viene sin signos de interrogación.
-let nuevaEncuesta = function (data) {
+// Por lo menos era lo que yo suponía y parece que me equivoqué.
+// data.pregunta es la original
+// pregunta es la que no tiene signos de interrogación
+let nuevaEncuesta = function (pregunta, data) {
   console.log("Nueva encuesta.")
-  let preg = data.pregunta;
   let opciones = data["opciones[]"].map(function(opcion){
     return {op : opcion, votos : 0};
   });
 
   return {
-    pregunta : preg,
-    opciones :  opciones
+    pregunta : pregunta,
+    opciones : opciones
   };
 };
 
@@ -254,25 +222,3 @@ function indiceDe(elem, arrDeObj){
   }
   return indice;
 };
-
-/*
-Crear encuesta:
-
-el $.ajax() vuelve por el lado del error aunque se haya creado la encuesta
-
-*/
-
-
-/*
-// Así está MAL
-// ¿Cómo debo escribir esta pregunta?
-function preguntaRepetida(pregunta, username, next) {
-  Encuesta.findOne({pregunta: pregunta, creador: username}, function(err, encuesta) {
-    if (err) {
-      return next(err);
-    } else {
-      return next(null); //¿?
-    }
-  });
-};
-*/
