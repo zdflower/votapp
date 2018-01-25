@@ -48,8 +48,12 @@ $(document).ready(function(){
       error:  function(data) {
         alert('Error status: ' + data.status);
         // window.location.href= appUrl + '/' + usuario + '/crearEncuesta';
-        // No me gusta esta solución...
-        // $('#mensajeError').append("SE PRODUJO ALGÚN TIPO DE ERROR");
+        // No me gusta esta solución (pero es la que hay por ahora):
+        $('#mensajeError').append("<p>SE PRODUJO ALGÚN TIPO DE ERROR y no sé cómo mostrar el mensaje de error correspondiente.</p>");
+                                + "<p>Podría ser que la pregunta tiene menos de 2 caracteres.</p>"
+                                + "<p>O que ya exista una encuesta con la misma pregunta.</p>"
+                                + "<p>O alguna de las opciones tiene menos de 2 caracteres.</p>"
+        );
       }
     }); // ajax post
     event.preventDefault();
