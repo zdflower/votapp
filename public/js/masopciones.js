@@ -25,9 +25,27 @@ $(document).ready(function(){
     let pregunta = $('input[name="pregunta"]').val();
     let usuario = $('input[name="usuario"]').val();
     // Obtengo las opciones
+
+/*
+¿De qué otra manera que no estoy viendo se puede considerar este problema?
+
+No sé cómo validar una cantidad de opciones variable con express-validator.
+Si no sé cuántas opciones van a haber de antemano, ¿cómo hago la validación?
+¿Podría pasar el número de elementos de opciones y que quede en req.body.cantidadOpciones?
+Por otro lado el problema podría estar en que los números del nombre de cada campo de opción no necesariamente va a ser consecutivo porque un usuario pudo haber añadido una opción y después haberla borrado.
+Podría leer los nombres de campo de las opciones y reemplazarlos por nombres que tengan números consecutivos.
+Y después tengo que revisar y cambiar cómo creo la encuesta, porque ahora las opciones no están agrupadas...
+*/
     let opciones = $('input').filter('.opcion').toArray();
-    opciones = opciones.map(function(op) { return op.value; });
-    let datos = {pregunta: pregunta, opciones: opciones};
+    //opciones = opciones.map(function(op) { return op.value; });
+    let datos = {pregunta: pregunta, cantidadOpciones: opciones.length};
+    let n = 0;
+    // por cada opción en opciones, agregar a datos { "op" + n : op.value  } y n++
+    opciones.forEach(function(op){
+      datos["op" + n] = op.value;
+      n += 1;
+    });
+
     // Hago un pedido post
     /*
     - en vez del evento submit del formulario usé el evento click del botón de submit
@@ -49,7 +67,7 @@ $(document).ready(function(){
         alert('Error status: ' + data.status);
         // window.location.href= appUrl + '/' + usuario + '/crearEncuesta';
         // No me gusta esta solución (pero es la que hay por ahora):
-        $('#mensajeError').append("<p>SE PRODUJO ALGÚN TIPO DE ERROR y no sé cómo mostrar el mensaje de error correspondiente.</p>");
+        $('#mensajeError').append("<p>SE PRODUJO ALGÚN TIPO DE ERROR y no sé cómo mostrar el mensaje de error correspondiente.</p>"
                                 + "<p>Podría ser que la pregunta tiene menos de 2 caracteres.</p>"
                                 + "<p>O que ya exista una encuesta con la misma pregunta.</p>"
                                 + "<p>O alguna de las opciones tiene menos de 2 caracteres.</p>"
