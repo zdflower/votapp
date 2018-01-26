@@ -2,10 +2,9 @@
   "name": "votapp",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js --exec './node_modules/.bin/eslint **/*.js'"
+    "dev": "./node_modules/nodemon/bin/nodemon.js app.js"
   },
   "author": "ZDFlower",
   "license": "MIT",
@@ -13,12 +12,14 @@
     "url": "https://github.com/zdflower/votapp"
   },
   "devDependencies": {
+    "debug": "^3.1.0",  
     "eslint": "^4.16.0",
     "eslint-config-standard": "^11.0.0-beta.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-standard": "^3.0.1"
+    "eslint-plugin-standard": "^3.0.1",
+    "nodemon": "^1.14.11"
   },
   "dependencies": {
     "async": "^2.6.0",
@@ -31,6 +32,7 @@
     "express-messages": "^1.0.1",
     "express-session": "^1.15.6",
     "express-validator": "^4.3.0",
+    "joi": "^13.1.1",
     "moment": "^2.20.1",
     "mongoose": "^5.0.1",
     "morgan": "^1.9.0",
