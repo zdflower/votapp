@@ -1,5 +1,9 @@
-const { body,validationResult } = require('express-validator/check');
-const { sanitizeBody } = require('express-validator/filter');
+const Joi = require('joi');
+// https://www.npmjs.com/package/joi
+const schema = Joi.object().keys({
+  "pregunta": Joi.string().min(2).max(100).required(),
+  "opciones[]": Joi.array().items(Joi.string().min(2)).min(2).required()
+})
 
 const Encuesta = require('../models/encuesta.js');
 
@@ -65,44 +69,23 @@ Casos de error:
       2.2) la pregunta es repetida
 */
 
-exports.crearEncuesta_post = [
-  //Nunca llega acá.
-
-// ¿Cómo hago para que no se tengan en cuenta los signos de interrogación?
-// ¿No se puede modificar el req.body antes de que lo chequee el validador?
-
-  // Validación
-  // La pregunta debe tener al menos dos caracteres
-  // Debe haber al menos 2 opciones
-  // Cada opción debe tener al menos 2 caracteres
-
-  // Ver https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/forms
-  body('pregunta', 'La pregunta debe tener al menos dos caracteres (sin contar signos de interrogación).').isLength({ min: 2 }),
-  body('opciones[]', 'Debe haber al menos dos opciones').isLength({ min: 2 }),
-  sanitizeBody('pregunta').trim().escape(),
-  sanitizeBody('opciones[]'),
-
-// Tengo un problema y no me doy cuenta de cómo resolverlo:
-// el primer argumento de body y sanitizeBody es el nombre de un campo o un array de nombres de campos del formulario.
-// ¿Cómo hago para validar todas las opciones, si no sé de antemano cuántas son, cómo hago para identificarlas?
-
+exports.crearEncuesta_post =
   (req, res, next) => {
-      console.log("POST: CREA ENCUESTA.");
-      // Extract the validation errors from a request.
-      const errors = validationResult(req);
-      console.log(errors.mapped());
-      if (!errors.isEmpty()) {
-          // There are errors. Render form again with sanitized values/errors messages.
-          // Error messages can be returned in an array using `errors.array()`.
-          console.log('Hubo errores de validación:');
-          console.log(errors.mapped());
-          return res.status(422).json({ errors: errors.mapped() });
-          }
+    console.log("CREA ENCUESTA.");
+    console.log("Validación.");
+    /* Validación de los datos */
+    const result = Joi.validate({ pregunta: req.body.pregunta, "opciones[]": req.body["opciones[]"] }, schema, {abortEarly: false});
+    if (result.error){
+        console.log('Hubo errores de validación:');
+        console.log(result.error);
+        // ¿Cómo uso {error: result.error} del lado del cliente, para mostrar el mensaje?
+        return res.status(422).json({ error: result.error });
+      }
       else {
-        // Data from form is valid.
+        // ¿Debería usar result.value.pregunta y result.value[opciones[]]?
+        // Los datos son válidos pero falta ver si la pregunta está repetida
         let usuario_logueado = req.user
         let preg = descartarSignosInterrogacion(req.body.pregunta);
-        let opciones = req.body["opciones[]"];
         console.log('Usuario: ' + usuario_logueado.local.username + '\nPregunta: ' + preg);
         // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
         Encuesta.findOne({pregunta: preg, creador: usuario_logueado.local.username}, function(err, resultado){
@@ -131,7 +114,6 @@ exports.crearEncuesta_post = [
             nueva_encuesta.creador = usuario_logueado.local.username;
             console.log("nueva_encuesta: ");
             console.log(nueva_encuesta);
-            // TENGO QUE CHEQUEAR QUE ESTÉN COMPLETOS LOS CAMPOS REQUERIDOS POR EL ESQUEMA DE ENCUESTA, SINO TIRA ERROR.
             nueva_encuesta.save(function (err) {
               if (err) {
                 console.log("Error guardando encuesta.");
@@ -145,8 +127,7 @@ exports.crearEncuesta_post = [
           }
       }); // fin búsqueda encuesta
     }
-  }
-]; // fin crearEncuesta_post
+}; // fin crearEncuesta_post
 
 exports.votarEncuesta = function(req, res, next) {
   var filtro = {'pregunta': req.params.pregunta, 'creador': req.params.username};
@@ -219,17 +200,15 @@ function descartarSignosInterrogacion(pregunta) {
   return preg;
 }
 
-// data =  {'pregunta': "...", 'opciones[]': ["...", "..."]}
-// La pregunta ya viene sin signos de interrogación.
-// Por lo menos era lo que yo suponía y parece que me equivoqué.
-// data.pregunta es la original
+// data.pregunta es la original,
 // pregunta es la que no tiene signos de interrogación
+// data.cantidadOpciones es la cantidad de opciones,
+// data.opX (donde X es un número de 1 en adelante) es el nombre de la opción.
 let nuevaEncuesta = function (pregunta, data) {
-  console.log("Nueva encuesta.")
+  console.log("Nueva encuesta.");
   let opciones = data["opciones[]"].map(function(opcion){
-    return {op : opcion, votos : 0};
+      return {op : opcion, votos : 0};
   });
-
   return {
     pregunta : pregunta,
     opciones : opciones
