@@ -1,6 +1,6 @@
 'use strict';
 const moment = require('moment')
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 let EncuestaSchema = mongoose.Schema({
   pregunta : { type: String, required: true, min: 2, max: 100 },
