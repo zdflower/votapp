@@ -77,7 +77,7 @@ input[type="radio"] {
   float:left;
 }
 
-#login {
+.login {
   text-align: center;
 }
 
