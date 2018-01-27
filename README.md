@@ -54,3 +54,4 @@ There are many sources that helped me learn, understand various aspects of the p
 * You can share a poll by copying the link of that poll's page.
 * I would like to improve the design of the pages.
 * The polls have date of creation (for now, in english).
+* The index page shows polls by date of creation (the last first).

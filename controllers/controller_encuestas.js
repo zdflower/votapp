@@ -11,7 +11,7 @@ const schema = Joi.object().keys({
 const Encuesta = require('../models/encuesta.js');
 
 exports.obtenerEncuestas = function (req, res, next){
-  Encuesta.find({}, function (err, encuestas) {
+  Encuesta.find({}).sort({fecha: -1}).exec(function (err, encuestas) {
     if (err){
       return next(err);
     } else {
@@ -79,6 +79,7 @@ exports.crearEncuesta_post =
         debug('Hubo errores de validación:');
         debug(result.error);
         // ¿Cómo uso {error: result.error} del lado del cliente, para mostrar el mensaje?
+        // ¿Qué pasa si uso return next(result.error)?
         return res.status(422).json({ error: result.error });
       }
       else {
@@ -130,7 +131,7 @@ exports.crearEncuesta_post =
 }; // fin crearEncuesta_post
 
 exports.votarEncuesta = function(req, res, next) {
-  var filtro = {'pregunta': req.params.pregunta, 'creador': req.params.username};
+  const filtro = {'pregunta': req.params.pregunta, 'creador': req.params.username};
   Encuesta.findOne(filtro).exec(function(err, encuesta){
     if (err) {
       return next(err);
@@ -214,7 +215,7 @@ let nuevaEncuesta = function (pregunta, data) {
 };
 
 function indiceDe(elem, arrDeObj){
-  var indice = 0;
+  let indice = 0;
   for (let i = 0; i < arrDeObj.length; i++){
     if (arrDeObj[i].op === elem){
       indice = i;
