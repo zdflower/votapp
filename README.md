@@ -45,6 +45,7 @@ There are many sources that helped me learn, understand various aspects of the p
 * https://caolan.github.io/async/docs.html
 * https://github.com/bocoup/jqfundamentals.com
 * Eloquent Javascript http://eloquentjavascript.net
+* Joi package for validation.
 * etc.
 
 ## Other Comments
