@@ -1,6 +1,6 @@
 'use strict';
 
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 let UsuarioSchema = mongoose.Schema({
   local : { username: String, password: String },
