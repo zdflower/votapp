@@ -1,3 +1,6 @@
+const debug = require('debug')('crearEncuesta'); // ¿y si querés debuguear otra cosa cambiás acá el nombre?
+// ¿ Qué pasa si usás debug en varias partes a la vez, a todas les da el mismo nombre...? Debo estar razonando mal acerca del asunto.
+
 const Joi = require('joi');
 // https://www.npmjs.com/package/joi
 const schema = Joi.object().keys({
@@ -27,12 +30,10 @@ exports.obtenerEncuestas = function (req, res, next){
 exports.obtenerEncuesta = function(req, res, next) {
   Encuesta.findOne({pregunta: req.params.pregunta, creador: req.params.username}, function(err, encuesta) {
     if (err) {
-      // console.log(err);
-      // res.send(err);
+      //debug(err);
       return next(err);
     } else {
       if (encuesta){
-        // console.log('FINDONE: ' + encuesta);
         // si hay un usuario logueado pasar el nombre
         if (req.user){
           res.render('encuesta', {title: 'Encuesta', encuesta: encuesta, usuario: req.user});
@@ -40,7 +41,6 @@ exports.obtenerEncuesta = function(req, res, next) {
           res.render('encuesta', {title: 'Encuesta', encuesta: encuesta});
         }
       } else {
-        // res.send('No existe la encuesta');
         const error = new Error('No existe la página');
         error.status = 404;
         next(error);
@@ -71,13 +71,13 @@ Casos de error:
 
 exports.crearEncuesta_post =
   (req, res, next) => {
-    console.log("CREA ENCUESTA.");
-    console.log("Validación.");
+    debug("CREA ENCUESTA.");
+    debug("Validación.");
     /* Validación de los datos */
     const result = Joi.validate({ pregunta: req.body.pregunta, "opciones[]": req.body["opciones[]"] }, schema, {abortEarly: false});
     if (result.error){
-        console.log('Hubo errores de validación:');
-        console.log(result.error);
+        debug('Hubo errores de validación:');
+        debug(result.error);
         // ¿Cómo uso {error: result.error} del lado del cliente, para mostrar el mensaje?
         return res.status(422).json({ error: result.error });
       }
@@ -86,25 +86,25 @@ exports.crearEncuesta_post =
         // Los datos son válidos pero falta ver si la pregunta está repetida
         let usuario_logueado = req.user
         let preg = descartarSignosInterrogacion(req.body.pregunta);
-        console.log('Usuario: ' + usuario_logueado.local.username + '\nPregunta: ' + preg);
+        debug('Usuario: ' + usuario_logueado.local.username + '\nPregunta: ' + preg);
         // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
         Encuesta.findOne({pregunta: preg, creador: usuario_logueado.local.username}, function(err, resultado){
           if (err){
-            console.log("Error: " + err);
+            debug("Error: " + err);
             req.flash('error', 'Algo salió mal al buscar la encuesta.');
             res.send(err);
           }
           // No hubo error en la búsqueda.
-          console.log('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
+          debug('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
           if (resultado) {
-            console.log('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
+            debug('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
             req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
             const error = new Error('Ya existe una encuesta con la pregunta: "' + preg + '"');
             error.status = 400;
             // quizá en vez de err sea error... Sí, eso lo solucionó.
             return next(error);//res.send(error);
           } else {
-            console.log('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
+            debug('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
             // Llegado acá, se cumplen todas las condiciones para crear la encuesta.
             // Creo la nueva encuesta y la guardo.
             // Acá está el problema de los signos de interrogación: como paso req.body, no usa la pregunta sin signos de interrogación, sino la original.
@@ -112,11 +112,11 @@ exports.crearEncuesta_post =
             let nueva_encuesta = new Encuesta(nuevaEncuesta(preg, req.body));
             // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
             nueva_encuesta.creador = usuario_logueado.local.username;
-            console.log("nueva_encuesta: ");
-            console.log(nueva_encuesta);
+            debug("nueva_encuesta: ");
+            debug(nueva_encuesta);
             nueva_encuesta.save(function (err) {
               if (err) {
-                console.log("Error guardando encuesta.");
+                debug("Error guardando encuesta.");
                 req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
                 res.send(err);
               }
@@ -136,10 +136,10 @@ exports.votarEncuesta = function(req, res, next) {
       return next(err);
     } else {
       let opt = req.body.op;
-      console.log("Opciones:" + encuesta.opciones);
+      debug("Opciones:" + encuesta.opciones);
       // no puedo usar directamente indexOf porque opciones es una lista de {op: ..., votos: ...}
       let i = indiceDe(opt, encuesta.opciones);
-      console.log("índice de " + opt + " (la opción votada): " + i);
+      debug("índice de " + opt + " (la opción votada): " + i);
       if (i !== -1){
         let query = 'opciones.' + i + '.votos';
         let obj = {[query] : 1};
@@ -161,12 +161,10 @@ exports.votarEncuesta = function(req, res, next) {
 exports.obtenerOpcionesAPI = function(req, res, next) {
   Encuesta.findOne({pregunta: req.params.pregunta}, function(err, encuesta) {
     if (err) {
-      // console.log(err);
-      // res.send(err);
+      // debug(err);
       return next(err);
     } else {
       if (encuesta){
-        // console.log('FINDONE: ' + encuesta);
         res.json(encuesta.opciones);
       } else {
         res.json({'msg': 'No existe la encuesta'});
@@ -185,7 +183,7 @@ exports.borrarEncuesta = function (req, res, next) {
     if (err) {
       return next(err);
     }
-    console.log("ENCUESTA BORRADA")
+    debug("ENCUESTA BORRADA")
     req.flash('success', 'Encuesta borrada.');
     res.send('OK');
   });
@@ -194,7 +192,7 @@ exports.borrarEncuesta = function (req, res, next) {
 // Funciones auxiliares no exportadas
 
 function descartarSignosInterrogacion(pregunta) {
-  console.log("Descartando signos de interrogación.");
+  debug("Descartando signos de interrogación.");
   let preg = (pregunta.charAt(0) === '¿') ? pregunta.slice(1, pregunta.length) : pregunta;
   preg = (preg.charAt(preg.length - 1) === '?') ? preg.slice(0, preg.length - 1) : preg;
   return preg;
@@ -205,7 +203,7 @@ function descartarSignosInterrogacion(pregunta) {
 // data.cantidadOpciones es la cantidad de opciones,
 // data.opX (donde X es un número de 1 en adelante) es el nombre de la opción.
 let nuevaEncuesta = function (pregunta, data) {
-  console.log("Nueva encuesta.");
+  debug("Nueva encuesta.");
   let opciones = data["opciones[]"].map(function(opcion){
       return {op : opcion, votos : 0};
   });
