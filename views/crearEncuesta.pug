@@ -2,7 +2,7 @@ extends layout
 block content
   #mensajeError
   h1 Nueva Encuesta
-  form
+  form(method="POST" action= usuario.url + "crearEncuesta")
     .form-group
       label Usuario
       input.form-control(name="usuario" disabled="true" value= usuario.local.username placeholder= usuario.local.username)
