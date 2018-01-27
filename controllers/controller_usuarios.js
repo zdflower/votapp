@@ -21,6 +21,8 @@ exports.obtenerUsuarios = function (req, res, next){
   });
 };
 
+// Podría ordenar las encuestas del usuario por fecha de creación de la última a la primera
+
 // Sólo debería ser accesible por el propio usuario.
 // ¿Cómo debería ser si quisiera que un usuario pudiera ver el perfil de otro?
 // Porque al renderear la página, habría 2 usuarios uno logueado, el req.user que es el que se mostraría en la barra de navegación, y el del perfil.
@@ -33,7 +35,7 @@ exports.perfilUsuario = function (req, res, next){
       Usuario.findOne({'local.username': req.params.username}).exec(callback)
     },
     encuestas_usuario: function(callback) {
-      Encuesta.find({ 'creador': req.params.username }).exec(callback)
+      Encuesta.find({ 'creador': req.params.username }).sort({fecha: -1}).exec(callback)
     }
   }, function(err, results) {
     if (err) { return next(err); } // Error in API usage.
