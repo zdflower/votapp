@@ -1,4 +1,4 @@
-var async = require('async');
+const async = require('async');
 const Usuario = require('../models/usuario.js');
 const Encuesta = require('../models/encuesta.js');
 const passport = require('passport');
@@ -38,13 +38,13 @@ exports.perfilUsuario = function (req, res, next){
   }, function(err, results) {
     if (err) { return next(err); } // Error in API usage.
     if (results.usuario == null) { // No results.
-      var err = new Error('Página no encontrada'); // Usuario no encontrado
+      const err = new Error('Página no encontrada'); // Usuario no encontrado
       err.status = 404;
       return next(err);
     }
     if (results.encuestas_usuario == null){
       console.log("Ninguna encuesta");
-      var err = new Error('Página no encontrada'); // Encuesta no encontrada
+      const err = new Error('Página no encontrada'); // Encuesta no encontrada
       err.status = 404;
       return next(err);
     }
@@ -64,7 +64,7 @@ exports.perfilUsuario = function (req, res, next){
 
 // Reescribir, porque así es difícil de leer y de mantener.
 exports.signup_post = function (req, res, next) {
-  var nombre = req.body.username;
+  const nombre = req.body.username;
   if (nombre.length >= 2){
     Usuario.findOne({'local.username': nombre},
       function (err, user) {
@@ -77,13 +77,13 @@ exports.signup_post = function (req, res, next) {
         if (user) {
           res.send("Ya existe un usuario con ese nombre.");
         } else {
-          var newUser = new Usuario();
+          const newUser = new Usuario();
           newUser.local.username = nombre;
           newUser.local.password = req.body.password;
 
           // Encriptación del password
-          var salt = bcrypt.genSaltSync(10);
-          var hash = bcrypt.hashSync(newUser.local.password, salt);
+          const salt = bcrypt.genSaltSync(10);
+          const hash = bcrypt.hashSync(newUser.local.password, salt);
 
           // Guardo el hash
           newUser.local.password = hash;
