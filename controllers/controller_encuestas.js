@@ -10,25 +10,28 @@ const schema = Joi.object().keys({
 
 const Encuesta = require('../models/encuesta.js');
 
+/* No veo la forma de evitar el callback hell */
+
 exports.obtenerEncuestas = function (req, res, next){
-  Encuesta.find({}).sort({fecha: -1}).exec(function (err, encuestas) {
-    if (err){
-      return next(err);
-    } else {
-      // no puedo acceder a req.user.username si no hay ningún usuario logueado.
-      if (req.user){
-        // paso el usuario porque lo usa layout
-        res.render('index', {title: 'Encuestas', encuestas: encuestas, usuario: req.user});
+  Encuesta.find({}).sort({fecha: -1}).exec(
+    function renderIndex(err, encuestas) {
+      if (err){
+        return next(err);
       } else {
-        // acá si no hay un usuario logueado no va a hacer falta pasar usuario
-        res.render('index', {title: 'Encuestas', encuestas: encuestas});
+          // no puedo acceder a req.user.username si no hay ningún usuario logueado.
+          if (req.user){
+            // paso el usuario porque lo usa layout
+            res.render('index', {title: 'Encuestas', encuestas: encuestas, usuario: req.user});
+          } else {
+            // acá si no hay un usuario logueado no va a hacer falta pasar usuario
+            res.render('index', {title: 'Encuestas', encuestas: encuestas});
+          }
       }
-    }
-  });
+   });
 };
 
 exports.obtenerEncuesta = function(req, res, next) {
-  Encuesta.findOne({pregunta: req.params.pregunta, creador: req.params.username}, function(err, encuesta) {
+  Encuesta.findOne({pregunta: req.params.pregunta, creador: req.params.username}, function renderEncuesta(err, encuesta) {
     if (err) {
       //debug(err);
       return next(err);
@@ -43,10 +46,12 @@ exports.obtenerEncuesta = function(req, res, next) {
       } else {
         const error = new Error('No existe la página');
         error.status = 404;
-        next(error);
+        return next(error); //
       }
     }
   });
+/* Me gustaría poder llamar a renderEncuesta acá y tener definida esa función en otro lado,
+pero no logro darme cuenta cómo hacer que funcione, que pueda acceder a req y res y next. */
 };
 
 exports.crearEncuesta_get = function(req, res){
@@ -69,8 +74,7 @@ Casos de error:
       2.2) la pregunta es repetida
 */
 
-exports.crearEncuesta_post =
-  (req, res, next) => {
+exports.crearEncuesta_post = function (req, res, next) {
     debug("CREA ENCUESTA.");
     debug("Validación.");
     /* Validación de los datos */
@@ -85,49 +89,9 @@ exports.crearEncuesta_post =
       else {
         // ¿Debería usar result.value.pregunta y result.value[opciones[]]?
         // Los datos son válidos pero falta ver si la pregunta está repetida
-        let usuario_logueado = req.user
-        let preg = descartarSignosInterrogacion(req.body.pregunta);
-        debug('Usuario: ' + usuario_logueado.local.username + '\nPregunta: ' + preg);
-        // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
-        Encuesta.findOne({pregunta: preg, creador: usuario_logueado.local.username}, function(err, resultado){
-          if (err){
-            debug("Error: " + err);
-            req.flash('error', 'Algo salió mal al buscar la encuesta.');
-            res.send(err);
-          }
-          // No hubo error en la búsqueda.
-          debug('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
-          if (resultado) {
-            debug('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
-            req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
-            const error = new Error('Ya existe una encuesta con la pregunta: "' + preg + '"');
-            error.status = 400;
-            // quizá en vez de err sea error... Sí, eso lo solucionó.
-            return next(error);//res.send(error);
-          } else {
-            debug('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
-            // Llegado acá, se cumplen todas las condiciones para crear la encuesta.
-            // Creo la nueva encuesta y la guardo.
-            // Acá está el problema de los signos de interrogación: como paso req.body, no usa la pregunta sin signos de interrogación, sino la original.
-            // Le paso además del body la pregunta sin los signos de interrogación, por lo menos hasta que sepa si se puede (y cómo) modificar req.body.pregunta y así pasarle sólo req.body, o hasta que encuentre una solución mejor.
-            let nueva_encuesta = new Encuesta(nuevaEncuesta(preg, req.body));
-            // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
-            nueva_encuesta.creador = usuario_logueado.local.username;
-            debug("nueva_encuesta: ");
-            debug(nueva_encuesta);
-            nueva_encuesta.save(function (err) {
-              if (err) {
-                debug("Error guardando encuesta.");
-                req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
-                res.send(err);
-              }
-              // si no hubo error llegamos acá, si hubo error, creo que no llegás acá.
-              req.flash('success', 'Encuesta creada');
-              res.send('Ok');
-            }); // fin guardado de encuesta
-          }
-      }); // fin búsqueda encuesta
-    }
+       // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
+        chequearEncuesta(req, res, next);
+    } // fin else no hubo error de validación
 }; // fin crearEncuesta_post
 
 exports.votarEncuesta = function(req, res, next) {
@@ -190,8 +154,52 @@ exports.borrarEncuesta = function (req, res, next) {
   });
 };
 
-// Funciones auxiliares no exportadas
 
+function chequearEncuesta(req, res, next){
+  let usuario_logueado = req.user
+  let preg = descartarSignosInterrogacion(req.body.pregunta);
+  debug('Usuario: ' + usuario_logueado.local.username + '\nPregunta: ' + preg);
+  Encuesta.findOne({pregunta: preg, creador: usuario_logueado.local.username}, function chequearEncRepetida(err, resultado){
+    if (err){
+      debug("Error: " + err);
+      req.flash('error', 'Algo salió mal al buscar la encuesta.');
+      res.send(err);
+    }
+    // No hubo error en la búsqueda.
+    debug('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
+    if (resultado) {
+      debug('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
+      req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
+      const error = new Error('Ya existe una encuesta con la pregunta: "' + preg + '"');
+      error.status = 400;
+      // quizá en vez de err sea error... Sí, eso lo solucionó.
+      return next(error);//res.send(error);
+    } else {
+      debug('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
+      // Llegado acá, se cumplen todas las condiciones para crear la encuesta.
+      // Creo la nueva encuesta y la guardo.
+      // Acá está el problema de los signos de interrogación: como paso req.body, no usa la pregunta sin signos de interrogación, sino la original.
+      // Le paso además del body la pregunta sin los signos de interrogación, por lo menos hasta que sepa si se puede (y cómo) modificar req.body.pregunta y así pasarle sólo req.body, o hasta que encuentre una solución mejor.
+      let nueva_encuesta = new Encuesta(nuevaEncuesta(preg, req.body));
+      // ¿Cómo se manejan posibles errores en nuevaEncuesta() y en new Encuesta()?
+      nueva_encuesta.creador = usuario_logueado.local.username;
+      debug("nueva_encuesta: ");
+      debug(nueva_encuesta);
+      nueva_encuesta.save(function (err) {
+        if (err) {
+          debug("Error guardando encuesta.");
+          req.flash('error', 'Algo salió mal al intentar guardar la encuesta.');
+          res.send(err);
+        }
+        // si no hubo error llegamos acá, si hubo error, creo que no llegás acá.
+        req.flash('success', 'Encuesta creada');
+        res.send('Ok');
+      }); // fin guardado de encuesta
+    } // fin else no hay encuesta repetida
+  }); // fin búsqueda encuesta
+}
+
+// Funciones auxiliares
 function descartarSignosInterrogacion(pregunta) {
   debug("Descartando signos de interrogación.");
   let preg = (pregunta.charAt(0) === '¿') ? pregunta.slice(1, pregunta.length) : pregunta;
