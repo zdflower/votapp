@@ -6,16 +6,16 @@ const bcrypt = require('bcryptjs');
 const debug = require('debug')('ControllerUsuario');
 
 /* Ver cómo y dónde conviene hacer la validación de username y password */
-//const Joi = require('joi');
+const Joi = require('joi');
 
 /* La expresión regular /^[a-z]+$/ quiere decir: desde el comienzo (^) hasta el final ($) uno o más (+) caracteres de la a a la z en minúscula ([a-z]) */
 /* Contemplar la posibilidad de incluir también números, ñ, mayúsculas */
-/*
+/* Ver cómo sería chequear cada item por separado sin agrupar username, password, etc. */
 const schema = Joi.object().keys({
-  "username": Joi.string().regex(/^[a-z]+$/).min(4).max(50).required(),
-  "password": Joi.string().min(8).required()
+  "username": Joi.string().alphanum().trim().min(4).max(50).required().error(() => 'Username debe ser una cadena de letras y/o números de entre 4 y 50 caracteres'),
+  "password": Joi.string().trim().min(8).required(),
+  "passwordRe": Joi.string().trim().min(8).required()
 })
-*/
 
 exports.obtenerUsuarios = function (req, res, next){
   Usuario.find({}, function(err, usuarios){
@@ -33,12 +33,6 @@ exports.obtenerUsuarios = function (req, res, next){
     }
   });
 };
-
-// Podría ordenar las encuestas del usuario por fecha de creación de la última a la primera
-
-// Sólo debería ser accesible por el propio usuario.
-// ¿Cómo debería ser si quisiera que un usuario pudiera ver el perfil de otro?
-// Porque al renderear la página, habría 2 usuarios uno logueado, el req.user que es el que se mostraría en la barra de navegación, y el del perfil.
 
 // Ver tutorial https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website
 exports.perfilUsuario = function (req, res, next){
@@ -58,17 +52,13 @@ exports.perfilUsuario = function (req, res, next){
       return next(err);
     }
     if (results.encuestas_usuario == null){
-      console.log("Ninguna encuesta");
+      debug("Ninguna encuesta");
       const err = new Error('Página no encontrada'); // Encuesta no encontrada
       err.status = 404;
       return next(err);
     }
     // OK
-    console.log("Encontramos al usuario.");
-    // Me parece que hay ue pasar en usuario el req.user, que es el que está logueado y que debería ser el mismo.
-    // porque en realidad ningún otro usuario debería poder ir a un perfil que no es el propio.
-    // res.render('usuario', { title: 'Usuario', usuario: results.usuario, encuestas: results.encuestas_usuario} );
-    // esto está así por ahora.
+    debug("Encontramos al usuario.");
     if (req.user) {
       res.render('usuario', {title: 'Usuario', usuario_nombre: results.usuario.local.username, encuestas: results.encuestas_usuario, usuario: req.user});
     } else {
@@ -77,10 +67,36 @@ exports.perfilUsuario = function (req, res, next){
   });
 };
 
-// Reescribir, porque así es difícil de leer y de mantener.
+// //////////////// Reescribir, porque así es difícil de leer y de mantener. ///////////////////////////////
 exports.signup_post = function (req, res, next) {
-  const nombre = req.body.username;
-  if (nombre.length >= 2){
+  const nombre = req.body.username.trim();
+  const pwd = req.body.password.trim();
+  const pwdRe = req.body.passwordRe.trim();
+
+  const result = Joi.validate({
+    'username': nombre,
+    'password': pwd,
+    'passwordRe': pwdRe
+  }, schema, {abortEarly: false});
+  // chequear que coinciden password y passwordRe
+  let pwdsCoinciden = pwd === pwdRe;
+  // ¿Cómo hago para obtener por separado los errores y que tengan mensaje personalizado? Chequear la documentación de joi.
+  debug('Resultado:');
+  debug(result.error);
+  if (result.error || !pwdsCoinciden) {
+    // Me gustaría recoger todos los errores y mostrarlos en la página.
+    let errors = [];
+    result.error.details.forEach(function(error){
+      errors.push(error.message);
+    })
+    if (!pwdsCoinciden) {
+      errors.push('Los passwords no coinciden.');
+    }
+    debug('errors:');
+    debug(errors)
+    // Enviar la respuesta y renderear la página con los errores
+    res.render('signup', {errors: errors});
+  } else { /* Si no hay result.error y password y passwordRe coinciden entonces proceder con la registración. */
     Usuario.findOne({'local.username': nombre},
       function (err, user) {
         if (err){
@@ -95,7 +111,7 @@ exports.signup_post = function (req, res, next) {
         } else {
           const newUser = new Usuario();
           newUser.local.username = nombre;
-          newUser.local.password = req.body.password;
+          newUser.local.password = pwd;
 
           // Encriptación del password
           const salt = bcrypt.genSaltSync(10);
@@ -109,10 +125,10 @@ exports.signup_post = function (req, res, next) {
               // throw err;
               // req.flash('error', 'Problema con la base de datos al intentar guardar el nuevo usuario.');
               // res.redirect('/signup');
-              console.log("ERROR: Problema al intentar guardar el nuevo usuario en la base de datos ");
+              debug("ERROR: Problema al intentar guardar el nuevo usuario en la base de datos ");
               res.send(err);
             } else {
-              console.log("Nuevo usuario creado.");
+              debug("Nuevo usuario creado.");
               // quizá acá no habría que pasarle new user sino llamar a la función login() de passport
               // res.render('usuario', {usuario: newUser });
               /*  req.login(user, function(err) {
@@ -125,8 +141,6 @@ exports.signup_post = function (req, res, next) {
           }); // save
         }
       });
-  } else {
-    res.send("El nombre debe tener dos o más caracteres.");
   }
 };
 
