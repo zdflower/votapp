@@ -85,7 +85,7 @@ exports.crearEncuesta_post = function (req, res, next) {
         // ¿Qué pasa si uso return next(result.error)?
         // return res.status(422).json({ error: result.error });
         // return next(result.error);
-        req.flash("Errores de validación."); // No muestra este mensaje.
+        req.flash('error', "Debe completar la pregunta y al menos dos opciones."); // No lo mostraba antes porque le pasaba un solo argumento.
         res.redirect(req.user.url + '/crearEncuesta');
     }
     else {
