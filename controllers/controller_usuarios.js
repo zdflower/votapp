@@ -3,6 +3,19 @@ const Usuario = require('../models/usuario.js');
 const Encuesta = require('../models/encuesta.js');
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
+const debug = require('debug')('ControllerUsuario');
+
+/* Ver cómo y dónde conviene hacer la validación de username y password */
+//const Joi = require('joi');
+
+/* La expresión regular /^[a-z]+$/ quiere decir: desde el comienzo (^) hasta el final ($) uno o más (+) caracteres de la a a la z en minúscula ([a-z]) */
+/* Contemplar la posibilidad de incluir también números, ñ, mayúsculas */
+/*
+const schema = Joi.object().keys({
+  "username": Joi.string().regex(/^[a-z]+$/).min(4).max(50).required(),
+  "password": Joi.string().min(8).required()
+})
+*/
 
 exports.obtenerUsuarios = function (req, res, next){
   Usuario.find({}, function(err, usuarios){
@@ -72,12 +85,13 @@ exports.signup_post = function (req, res, next) {
       function (err, user) {
         if (err){
           // throw err;
-          console.log("ERROR: Problema con la base de datos: " + err);
-          // req.flash('error', 'Problema con la base de datos.');
-          // res.redirect('/signup');
+          debug("ERROR: Problema con la base de datos: " + err);
+          req.flash('error', 'Problema con la base de datos.');
+          res.redirect('/signup');
         }
         if (user) {
-          res.send("Ya existe un usuario con ese nombre.");
+          req.flash('error', "Ya existe un usuario con ese nombre.");
+          res.redirect('/signup');
         } else {
           const newUser = new Usuario();
           newUser.local.username = nombre;
