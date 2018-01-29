@@ -37,9 +37,9 @@ There are many sources that helped me learn, understand various aspects of the p
 * Mongoose http://mongoosejs.com/docs/ and MongoDB manual https://docs.mongodb.com/manual/
 * FCC Forum https://forum.freecodecamp.org
 * Stackoverflow, por ejemplo
- * https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests
- * https://stackoverflow.com/questions/32811510/mongoose-findoneandupdate-doesnt-return-updated-document#32811548
- * etc.
+  * https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests
+  * https://stackoverflow.com/questions/32811510/mongoose-findoneandupdate-doesnt-return-updated-document#32811548
+  * etc.
 * https://www.tutorialspoint.com/expressjs/
 * https://www.w3schools.com/jquery/jquery_ref_ajax.asp
 * https://caolan.github.io/async/docs.html
