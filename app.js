@@ -61,10 +61,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 require('./config/passportLocal')(passport);
 
 // Configurar session
-// no entiendo lo de secret: ...
 app.use(session({
   secret: 'secret_apptov',
-  resave: false,
+  resave: true,
   saveUninitialized: true
 }));
 
