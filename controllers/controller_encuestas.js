@@ -123,12 +123,19 @@ function formularioCrearEncuestaError(req, res, next){
 - que cuando se escribe una nueva opción se vote esa y no se pueda tener además otra elegida
 */
 exports.votarEncuesta = function(req, res, next) {
+  // Antes de proceder hay que chequear que req.body.op sea una cadena con al menos 2 caracteres
+  const opt = req.body.op;
+  const opcion = Joi.string().min(2).max(100).required()
+  const result = Joi.validate(opt, opcion);
+  if (result.error){
+    req.flash('error', 'Debe seleccionar una opción');
+    res.redirect('/' + req.params.username + '/' +req.params.pregunta);
+  } else {
   const filtro = {'pregunta': req.params.pregunta, 'creador': req.params.username};
   Encuesta.findOne(filtro).exec(function(err, encuesta){
     if (err) {
       return next(err);
     } else {
-      let opt = req.body.op;
       debug("Opciones:" + encuesta.opciones);
       // no puedo usar directamente indexOf porque opciones es una lista de {op: ..., votos: ...}
       let i = indiceDe(opt, encuesta.opciones);
@@ -173,7 +180,8 @@ exports.votarEncuesta = function(req, res, next) {
       }
     }
   });
-};
+} //
+}; // votarEncuesta
 
 exports.obtenerOpcionesAPI = function(req, res, next) {
   Encuesta.findOne({pregunta: req.params.pregunta}, function(err, encuesta) {
