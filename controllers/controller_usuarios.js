@@ -126,7 +126,8 @@ exports.signup_post = function (req, res, next) {
               // req.flash('error', 'Problema con la base de datos al intentar guardar el nuevo usuario.');
               // res.redirect('/signup');
               debug("ERROR: Problema al intentar guardar el nuevo usuario en la base de datos ");
-              res.send(err);
+              req.flash('error', 'Problema con la base de datos.');
+              res.redirect('/signup');
             } else {
               debug("Nuevo usuario creado.");
               // quizá acá no habría que pasarle new user sino llamar a la función login() de passport
