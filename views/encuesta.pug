@@ -8,13 +8,19 @@ block content
             small= '  ' + encuesta.creador + ' (' + encuesta.fechaConFormato + ')'
         .panel-body
           form(method="post", action= encuesta.url)
-            each opcion, i in encuesta.opciones
-              .form-check
-                input.form-check-input(name="op", type='radio', value='' + opcion.op)
-                label.form-check-label= opcion.op
-
+            .form-group#votarOpciones
+              each opcion, i in encuesta.opciones
+                .form-check
+                  input.form-check-input(name="op", type='radio', value='' + opcion.op)
+                  label.form-check-label= opcion.op
             input.btn.btn-primary(type="submit", value="Votar")
-
+          // Si el usuario está logueado entonces puede agregar una opción para luego votarla.
+          if usuario
+            .form-group
+              label Otra opción
+              input.form-control(name="otraOp" type="text")
+              input.btn.btn-primary#otraOpcion(value="Agregar opción")
+            script(src="/js/votaNuevaOp.js")
     .col-sm-12.col-md-6
       h3 Resultados
       // - each opcion, i in encuesta.opciones

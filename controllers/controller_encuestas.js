@@ -117,6 +117,11 @@ function formularioCrearEncuestaError(req, res, next){
   return result.error;
 }
 
+/* Falta validar el formulario de votación:
+- que haya que seleccionar una opción antes de clickear el botón votar
+- que sólo se pueda votar una opción
+- que cuando se escribe una nueva opción se vote esa y no se pueda tener además otra elegida
+*/
 exports.votarEncuesta = function(req, res, next) {
   const filtro = {'pregunta': req.params.pregunta, 'creador': req.params.username};
   Encuesta.findOne(filtro).exec(function(err, encuesta){
@@ -128,6 +133,9 @@ exports.votarEncuesta = function(req, res, next) {
       // no puedo usar directamente indexOf porque opciones es una lista de {op: ..., votos: ...}
       let i = indiceDe(opt, encuesta.opciones);
       debug("índice de " + opt + " (la opción votada): " + i);
+
+      /* ¿Por qué me da 0 el índice de un a opción que no existe? */
+
       if (i !== -1){
         let query = 'opciones.' + i + '.votos';
         let obj = {[query] : 1};
@@ -140,7 +148,28 @@ exports.votarEncuesta = function(req, res, next) {
           }
         });
       } else {
-        res.send("Parece que no existe esa opción. Algo salió muy mal.");
+        /* Por ahora hay un bug que permite elegir una de las dos opciones
+        originales y una personalizada, se pasan como un array porque a todos los input le di el nombre op*/
+
+        // Si no existe la opción agregarla y sumarle 1 voto.
+        // ¿Uso encuesta.opciones.push o encuesta.opciones.addToSet? Me parece que como cada opción es única estaría bien usar addToSet.
+        encuesta.opciones.addToSet({ op: req.body.op, votos: 1});
+        debug("¿Se agregó la nueva opción?");
+        debug(encuesta.opciones);
+        encuesta.save(function(err) {
+          if (err) {
+            return next(err);
+          } else {
+            req.flash('success', 'Voto registrado.');
+            res.redirect(encuesta.url); // Antes decía enc.url (lo copié de más arriba) y eso tiró un error no manejado, ya que enc no estaba definida.
+            // lo corregí, y descubrí lo sig: (había dos encuestas con la misma pregunta en la base de datos, por un error previo) venía votando en una de las encuestas y después de votar una opción agregada apareció la otra encuesta. voy a ver cómo está la base de datos, qué le pasó a la primera encuesta.
+            // Están las dos, ¿puede ser que al actualizarse con el nuevo voto le cambie la fecha? No estoy segura de eso porque se mantuvo la fecha de cada una. No entiendo qué pasó.
+            // No sé por qué muestra una y no la otra, por qué cambió.
+            // Igual no debería haber encuestas repetidas.
+            // Mientras seguí votando opciones agregadas siguió con la misma encuesta cambiada.
+            // Cuando voté una opción de las originales volvió a la encuesta anterior. ¿?
+          }
+        })
       }
     }
   });
@@ -240,6 +269,7 @@ function nuevaEncuesta(data) {
   };
 };
 
+/* Re-pensar la búsqueda, ¿de qué otra forma se puede hacer?, la forma actual ¿es suficientemente buena? */
 function indiceDe(elem, arrDeObj){
   let indice = 0;
   for (let i = 0; i < arrDeObj.length; i++){
@@ -247,5 +277,7 @@ function indiceDe(elem, arrDeObj){
       indice = i;
     }
   }
-  return indice;
+  // Si elem no está en arrDeObj devolver -1, sino indice.
+  let resultado = (arrDeObj[indice].op === elem)? indice : -1;
+  return resultado;
 };
