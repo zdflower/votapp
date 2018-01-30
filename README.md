@@ -13,11 +13,16 @@
 
 ## Other things to do:
 
-- [ ] Github authentication
-- [ ] mLab online database
+- [ ] Github authentication.
+- [ ] mLab online database.
+- [ ] Deploy the app to Glitch.
 - [x] Add form validation.
 - [ ] Use cdn links for bootstrap, jquery, chart.js, fontawesome.
 - [ ] Ask twice before deleting a poll (instead of deleting it inmediately after clicking the button).
+- [ ] Translate the app to English.
+- [ ] Translate the app to Esperanto.
+- [ ] Translate README.md to Spanish.
+- [ ] Translate README.md to Esperanto.
 
 ## Comments
 
