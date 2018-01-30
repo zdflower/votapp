@@ -17,7 +17,7 @@ const schema = Joi.object().keys({
 exports.obtenerUsuarios = function (req, res, next){
   Usuario.find({}, function(err, usuarios){
     if (err){
-      console.log(err);
+      console.error(err);
       return next(err);
     } else {
       // si hay un usuario logueado pasar el nombre
