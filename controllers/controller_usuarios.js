@@ -135,7 +135,7 @@ exports.locallogin_get = function (req, res, next) {
 }
 
 exports.locallogin_post = function(req, res, next){
-  console.log("Login authentication.");
+  debug("Login authentication.");
   passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
