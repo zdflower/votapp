@@ -7,9 +7,6 @@ const debug = require('debug')('ControllerUsuario');
 
 /* Ver cómo y dónde conviene hacer la validación de username y password */
 const Joi = require('joi');
-
-/* La expresión regular /^[a-z]+$/ quiere decir: desde el comienzo (^) hasta el final ($) uno o más (+) caracteres de la a a la z en minúscula ([a-z]) */
-/* Contemplar la posibilidad de incluir también números, ñ, mayúsculas */
 /* Ver cómo sería chequear cada item por separado sin agrupar username, password, etc. */
 const schema = Joi.object().keys({
   "username": Joi.string().alphanum().trim().min(4).max(50).required().error(() => 'Username debe ser una cadena de letras y/o números de entre 4 y 50 caracteres'),
@@ -24,7 +21,6 @@ exports.obtenerUsuarios = function (req, res, next){
       return next(err);
     } else {
       // si hay un usuario logueado pasar el nombre
-      // console.log(usuarios);
       if (req.user){
         res.render('usuarios', {title: 'Usuarios', usuario: req.user, usuarios: usuarios});
       } else {
@@ -67,7 +63,7 @@ exports.perfilUsuario = function (req, res, next){
   });
 };
 
-// //////////////// Reescribir, porque así es difícil de leer y de mantener. ///////////////////////////////
+// Reescribir para mejorar legibilidad y mantenimiento.
 exports.signup_post = function (req, res, next) {
   const nombre = req.body.username.trim();
   const pwd = req.body.password.trim();
@@ -80,11 +76,11 @@ exports.signup_post = function (req, res, next) {
   }, schema, {abortEarly: true});
   // chequear que coinciden password y passwordRe
   let pwdsCoinciden = pwd === pwdRe;
-  // ¿Cómo hago para obtener por separado los errores y que tengan mensaje personalizado? Chequear la documentación de joi.
+
   debug('Resultado:');
   debug(result.error);
   if (result.error || !pwdsCoinciden) {
-    // Me gustaría recoger todos los errores y mostrarlos en la página.
+    // Agrupo todos los mensajes de error y los muestro en la página.
     let errors = [];
     result.error.details.forEach(function(error){
       errors.push(error.message);
@@ -94,13 +90,11 @@ exports.signup_post = function (req, res, next) {
     }
     debug('errors:');
     debug(errors)
-    // Enviar la respuesta y renderear la página con los errores
     res.render('signup', {errors: errors});
   } else { /* Si no hay result.error y password y passwordRe coinciden entonces proceder con la registración. */
     Usuario.findOne({'local.username': nombre},
       function (err, user) {
         if (err){
-          // throw err;
           debug("ERROR: Problema con la base de datos: " + err);
           req.flash('error', 'Problema con la base de datos.');
           res.redirect('/signup');
@@ -122,28 +116,19 @@ exports.signup_post = function (req, res, next) {
 
           newUser.save(function(err) {
             if (err) {
-              // throw err;
-              // req.flash('error', 'Problema con la base de datos al intentar guardar el nuevo usuario.');
-              // res.redirect('/signup');
               debug("ERROR: Problema al intentar guardar el nuevo usuario en la base de datos ");
               req.flash('error', 'Problema con la base de datos.');
               res.redirect('/signup');
             } else {
               debug("Nuevo usuario creado.");
-              // quizá acá no habría que pasarle new user sino llamar a la función login() de passport
-              // res.render('usuario', {usuario: newUser });
-              /*  req.login(user, function(err) {
-              if (err) { return next(err); }
-                return res.redirect(req.user.url);
-                */
               req.flash('success', "Ya está registrado. Ahora por favor ingrese mediante login");
               res.redirect('/login');
             }
           }); // save
-        }
-      });
-  }
-};
+        } // nuevo usuario
+      }); // Usuario.findOne
+  } // No hay errores en el formulario
+}; // signup_post
 
 exports.locallogin_get = function (req, res, next) {
   res.render('login');
