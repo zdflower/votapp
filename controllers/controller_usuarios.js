@@ -77,7 +77,7 @@ exports.signup_post = function (req, res, next) {
     'username': nombre,
     'password': pwd,
     'passwordRe': pwdRe
-  }, schema, {abortEarly: false});
+  }, schema, {abortEarly: true});
   // chequear que coinciden password y passwordRe
   let pwdsCoinciden = pwd === pwdRe;
   // ¿Cómo hago para obtener por separado los errores y que tengan mensaje personalizado? Chequear la documentación de joi.
