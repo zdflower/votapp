@@ -14,7 +14,9 @@ block content
                   input.form-check-input(name="op", type='radio', value='' + opcion.op)
                   label.form-check-label= opcion.op
             input.btn.btn-primary(type="submit", value="Votar")
+
           // Si el usuario está logueado entonces puede agregar una opción para luego votarla.
+          #errorVota
           if usuario
             .form-group
               label Otra opción
