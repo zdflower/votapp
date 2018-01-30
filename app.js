@@ -60,6 +60,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // configurar passport
 require('./config/passportLocal')(passport);
 
+require('./config/passport')(passport);
+
 // Configurar session
 app.use(session({
   secret: 'secret_apptov',

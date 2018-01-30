@@ -48,6 +48,16 @@ module.exports = function(app, passport){
     .get(ControllerUsuarios.locallogin_get)
     .post(ControllerUsuarios.locallogin_post);
 
+  /* Github Authentication */
+  app.route('/auth/github')
+    .get(passport.authenticate('github'));
+
+  app.route('/auth/github/callback')
+      .get(passport.authenticate('github', {
+        successRedirect: '/',
+        failureRedirect: '/login'
+      }));
+
   app.get('/logout', function(req, res){
     req.logout(); // función de passport
     res.redirect('/login');
