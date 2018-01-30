@@ -32,7 +32,7 @@ exports.obtenerUsuarios = function (req, res, next){
 
 // Ver tutorial https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website
 exports.perfilUsuario = function (req, res, next){
-  console.log("Perfil usuario.");
+  debug("Perfil usuario.");
   async.parallel({
     usuario: function(callback) {
       Usuario.findOne({'local.username': req.params.username}).exec(callback)
