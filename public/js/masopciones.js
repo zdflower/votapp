@@ -1,5 +1,4 @@
 $(document).ready(function(){
-  var appUrl = window.location.origin;
   var cantOpciones = 2;
   $('#agregaop').click(function(){
     // agregar al formgroup de opciones un
@@ -15,7 +14,7 @@ $(document).ready(function(){
     $('#opciones').append(opcion);
     // console.log("cantOpciones: " + cantOpciones);
     $('.borrar').click(function(){
-      $(this).parent().remove();
+      $(this).parent().parent().parent().remove();
       // console.log("cantOpciones: " + cantOpciones);
     });
   });
