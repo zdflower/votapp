@@ -14,7 +14,7 @@
 ## Other things to do:
 
 - [x] Github authentication.
-- [ ] mLab online database.
+- [x] mLab online database.
 - [x] Add form validation.
 - [x] Use cdn links for bootstrap, jquery, chart.js, fontawesome.
 - [ ] Deploy the app to Glitch.
@@ -53,7 +53,7 @@ There are many sources that helped me learn, understand various aspects of the p
 * https://caolan.github.io/async/docs.html
 * https://github.com/bocoup/jqfundamentals.com
 * Eloquent Javascript http://eloquentjavascript.net
-* Joi package for validation.
+* Joi package for validation https://www.npmjs.com/package/joi.
 * etc.
 
 ## Other Comments
