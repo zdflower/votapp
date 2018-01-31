@@ -78,23 +78,7 @@ Casos de error:
 
 /* Por enésima vez revisar y reescribir esto */
 exports.crearEncuesta_post = function (req, res, next) {
-    debug("CREA ENCUESTA.");
-    // para validar obtengo una lista de las opciones
-    if (formularioCrearEncuestaError(req, res, next)){
-        // ¿Cómo uso {error: result.error} del lado del cliente, para mostrar el mensaje?
-        // ¿Qué pasa si uso return next(result.error)?
-        // return res.status(422).json({ error: result.error });
-        // return next(result.error);
-        req.flash('error', "Debe completar la pregunta y al menos dos opciones."); // No lo mostraba antes porque le pasaba un solo argumento.
-        res.redirect(req.user.url + '/crearEncuesta');
-    }
-    else {
-       // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
-       chequearEncuesta(req, res, next, datosEncuesta);
-    }
-}; // fin crearEncuesta_post
-
-function formularioCrearEncuestaError(req, res, next){
+  debug("CREA ENCUESTA.");
   let opcionesKeys = Object.keys(req.body).filter(function(opc){
     return (opc !== 'pregunta')
   });
@@ -109,6 +93,21 @@ function formularioCrearEncuestaError(req, res, next){
     pregunta: descartarSignosInterrogacion(req.body.pregunta).trim(),
     opciones: opciones
   };
+    if (formularioCrearEncuestaError(req, res, next, datosEncuesta)){
+        // ¿Cómo uso {error: result.error} del lado del cliente, para mostrar el mensaje?
+        // ¿Qué pasa si uso return next(result.error)?
+        // return res.status(422).json({ error: result.error });
+        // return next(result.error);
+        req.flash('error', "Debe completar la pregunta y al menos dos opciones."); // No lo mostraba antes porque le pasaba un solo argumento.
+        res.redirect(req.user.url + '/crearEncuesta');
+    }
+    else {
+       // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
+       chequearEncuesta(req, res, next, datosEncuesta);
+    }
+}; // fin crearEncuesta_post
+
+function formularioCrearEncuestaError(req, res, next, datosEncuesta){
   /* Validación de los datos */
   debug("Validación.");
   const result = Joi.validate(datosEncuesta, schema, {abortEarly: false});
