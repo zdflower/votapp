@@ -4,12 +4,12 @@ const express = require('express');
 const path = require('path');
 const bp = require('body-parser');
 const mongoose = require('mongoose');
-
 const routes = require('./routes/index');
 const session = require('express-session');
 const passport = require('passport');
-
 const morgan = require('morgan');
+const compression = require('compression');
+const helmet = require('helmet')
 
 // Inicializar el módulo dotenv, para poder usar las variables de entorno, ANTES de usarlas
 require('dotenv').load();
@@ -36,8 +36,12 @@ db.on('error', function(err) {throw err;});
 // init app
 const app = express();
 
+app.use(helmet());
+
 // logger
 app.use(morgan('dev'));
+
+app.use(compression());
 
 // load view engine
 app.set('views', path.join(__dirname, 'views'));
