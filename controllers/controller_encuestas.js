@@ -1,10 +1,8 @@
-const debug = require('debug')('crearEncuesta'); // ¿y si querés debuguear otra cosa cambiás acá el nombre?
-// ¿ Qué pasa si usás debug en varias partes a la vez, a todas les da el mismo nombre...? Debo estar razonando mal acerca del asunto.
+const debug = require('debug')('crearEncuesta');
 
 const Joi = require('joi');
 // https://www.npmjs.com/package/joi
 
-// Ojo que así como está permite que la pregunta sea "             " (puro espacio) y sospecho que pasa lo mismo con las opciones.
 const schema = Joi.object().keys({
   "pregunta": Joi.string().min(2).max(100).required(),
   "opciones": Joi.array().items(Joi.string().min(2)).min(2).required()
@@ -18,24 +16,25 @@ exports.obtenerEncuestas = function (req, res, next){
   Encuesta.find({}).sort({fecha: -1}).exec(
     function renderIndex(err, encuestas) {
       if (err){
+        debug(err);
         return next(err);
       } else {
-          // no puedo acceder a req.user.username si no hay ningún usuario logueado.
-          if (req.user){
-            // paso el usuario porque lo usa layout
-            res.render('index', {title: 'Encuestas', encuestas: encuestas, usuario: req.user});
-          } else {
-            // acá si no hay un usuario logueado no va a hacer falta pasar usuario
-            res.render('index', {title: 'Encuestas', encuestas: encuestas});
-          }
+        // no puedo acceder a req.user.username si no hay ningún usuario logueado.
+        if (req.user){
+          // paso el usuario porque lo usa layout
+          res.render('index', {title: 'Encuestas', encuestas: encuestas, usuario: req.user});
+        } else {
+          // acá si no hay un usuario logueado no va a hacer falta pasar usuario
+          res.render('index', {title: 'Encuestas', encuestas: encuestas});
+        }
       }
-   });
+    });
 };
 
 exports.obtenerEncuesta = function(req, res, next) {
   Encuesta.findOne({pregunta: req.params.pregunta, creador: req.params.username}, function renderEncuesta(err, encuesta) {
     if (err) {
-      //debug(err);
+      debug(err);
       return next(err);
     } else {
       if (encuesta){
@@ -48,12 +47,11 @@ exports.obtenerEncuesta = function(req, res, next) {
       } else {
         const error = new Error('No existe la página');
         error.status = 404;
+        debug(error);
         return next(error); //
       }
     }
   });
-/* Me gustaría poder llamar a renderEncuesta acá y tener definida esa función en otro lado,
-pero no logro darme cuenta cómo hacer que funcione, que pueda acceder a req y res y next. */
 };
 
 exports.crearEncuesta_get = function(req, res){
@@ -76,25 +74,8 @@ Casos de error:
       2.2) la pregunta es repetida
 */
 
-/* Por enésima vez revisar y reescribir esto */
 exports.crearEncuesta_post = function (req, res, next) {
-    debug("CREA ENCUESTA.");
-    // para validar obtengo una lista de las opciones
-    if (formularioCrearEncuestaError(req, res, next)){
-        // ¿Cómo uso {error: result.error} del lado del cliente, para mostrar el mensaje?
-        // ¿Qué pasa si uso return next(result.error)?
-        // return res.status(422).json({ error: result.error });
-        // return next(result.error);
-        req.flash('error', "Debe completar la pregunta y al menos dos opciones."); // No lo mostraba antes porque le pasaba un solo argumento.
-        res.redirect(req.user.url + '/crearEncuesta');
-    }
-    else {
-       // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
-       chequearEncuesta(req, res, next, datosEncuesta);
-    }
-}; // fin crearEncuesta_post
-
-function formularioCrearEncuestaError(req, res, next){
+  debug("CREA ENCUESTA.");
   let opcionesKeys = Object.keys(req.body).filter(function(opc){
     return (opc !== 'pregunta')
   });
@@ -109,6 +90,16 @@ function formularioCrearEncuestaError(req, res, next){
     pregunta: descartarSignosInterrogacion(req.body.pregunta).trim(),
     opciones: opciones
   };
+  if (formularioCrearEncuestaError(req, res, next, datosEncuesta)){
+    req.flash('error', "Debe completar la pregunta y al menos dos opciones.");
+    res.redirect(req.user.url + '/crearEncuesta');
+  } else {
+    // Chequeo si ya existe una encuesta del mismo usuario con la misma pregunta
+    chequearEncuesta(req, res, next, datosEncuesta);
+  }
+}; // fin crearEncuesta_post
+
+function formularioCrearEncuestaError(req, res, next, datosEncuesta){
   /* Validación de los datos */
   debug("Validación.");
   const result = Joi.validate(datosEncuesta, schema, {abortEarly: false});
@@ -117,7 +108,7 @@ function formularioCrearEncuestaError(req, res, next){
   return result.error;
 }
 
-/* Falta validar el formulario de votación:
+/* Para validar el formulario de votación:
 - que haya que seleccionar una opción antes de clickear el botón votar
 - que sólo se pueda votar una opción
 - que cuando se escribe una nueva opción se vote esa y no se pueda tener además otra elegida
@@ -131,62 +122,53 @@ exports.votarEncuesta = function(req, res, next) {
     req.flash('error', 'Debe seleccionar una opción');
     res.redirect('/' + req.params.username + '/' +req.params.pregunta);
   } else {
-  const filtro = {'pregunta': req.params.pregunta, 'creador': req.params.username};
-  Encuesta.findOne(filtro).exec(function(err, encuesta){
-    if (err) {
-      return next(err);
-    } else {
-      debug("Opciones:" + encuesta.opciones);
-      // no puedo usar directamente indexOf porque opciones es una lista de {op: ..., votos: ...}
-      let i = indiceDe(opt, encuesta.opciones);
-      debug("índice de " + opt + " (la opción votada): " + i);
-
-      /* ¿Por qué me da 0 el índice de un a opción que no existe? */
-
-      if (i !== -1){
-        let query = 'opciones.' + i + '.votos';
-        let obj = {[query] : 1};
-        Encuesta.findOneAndUpdate(filtro, { $inc: obj }, {new: true}).exec(function(err, enc) {
-          if (err) {
-            return next(err);
-          } else {
-            req.flash('success', 'Voto registrado.');
-            res.redirect(enc.url);
-          }
-        });
+    const filtro = {'pregunta': req.params.pregunta, 'creador': req.params.username};
+    Encuesta.findOne(filtro).exec(function(err, encuesta){
+      if (err) {
+        debug(err);
+        return next(err);
       } else {
-        /* Por ahora hay un bug que permite elegir una de las dos opciones
-        originales y una personalizada, se pasan como un array porque a todos los input le di el nombre op*/
-
-        // Si no existe la opción agregarla y sumarle 1 voto.
-        // ¿Uso encuesta.opciones.push o encuesta.opciones.addToSet? Me parece que como cada opción es única estaría bien usar addToSet.
-        encuesta.opciones.addToSet({ op: req.body.op, votos: 1});
-        debug("¿Se agregó la nueva opción?");
-        debug(encuesta.opciones);
-        encuesta.save(function(err) {
-          if (err) {
-            return next(err);
-          } else {
-            req.flash('success', 'Voto registrado.');
-            res.redirect(encuesta.url); // Antes decía enc.url (lo copié de más arriba) y eso tiró un error no manejado, ya que enc no estaba definida.
-            // lo corregí, y descubrí lo sig: (había dos encuestas con la misma pregunta en la base de datos, por un error previo) venía votando en una de las encuestas y después de votar una opción agregada apareció la otra encuesta. voy a ver cómo está la base de datos, qué le pasó a la primera encuesta.
-            // Están las dos, ¿puede ser que al actualizarse con el nuevo voto le cambie la fecha? No estoy segura de eso porque se mantuvo la fecha de cada una. No entiendo qué pasó.
-            // No sé por qué muestra una y no la otra, por qué cambió.
-            // Igual no debería haber encuestas repetidas.
-            // Mientras seguí votando opciones agregadas siguió con la misma encuesta cambiada.
-            // Cuando voté una opción de las originales volvió a la encuesta anterior. ¿?
-          }
-        })
-      }
-    }
-  });
-} //
+        debug("Opciones:" + encuesta.opciones);
+        // no puedo usar directamente indexOf porque opciones es una lista de {op: ..., votos: ...}
+        let i = indiceDe(opt, encuesta.opciones);
+        debug("índice de " + opt + " (la opción votada): " + i);
+        if (i !== -1){
+          let query = 'opciones.' + i + '.votos';
+          let obj = {[query] : 1};
+          Encuesta.findOneAndUpdate(filtro, { $inc: obj }, {new: true}).exec(function(err, enc) {
+            if (err) {
+              debug(err);
+              return next(err);
+            } else {
+              req.flash('success', 'Voto registrado.');
+              res.redirect(enc.url);
+            }
+          });
+        } else {
+          // Si no existe la opción agregarla y sumarle 1 voto.
+          // ¿Uso encuesta.opciones.push o encuesta.opciones.addToSet? Me parece que como cada opción es única estaría bien usar addToSet.
+          encuesta.opciones.addToSet({op: req.body.op, votos: 1});
+          debug("¿Se agregó la nueva opción?");
+          debug(encuesta.opciones);
+          encuesta.save(function(err) {
+            if (err) {
+              debug(err);
+              return next(err);
+            } else {
+              req.flash('success', 'Voto registrado.');
+              res.redirect(encuesta.url);
+            }
+          }) // guardar la encuesta modificada
+        } // else votar nueva opción
+      } // else Encontramos la encuesta
+    }); // buscar la encuesta en la que se quiere votar
+  } // else no hubo error de validación
 }; // votarEncuesta
 
 exports.obtenerOpcionesAPI = function(req, res, next) {
   Encuesta.findOne({pregunta: req.params.pregunta}, function(err, encuesta) {
     if (err) {
-      // debug(err);
+      debug(err);
       return next(err);
     } else {
       if (encuesta){
@@ -206,6 +188,7 @@ exports.borrarEncuesta = function (req, res, next) {
   let pregunta = req.params.pregunta;
   Encuesta.remove({pregunta: pregunta, creador: req.user.local.username}, function(err) {
     if (err) {
+      debug(err);
       return next(err);
     }
     debug("ENCUESTA BORRADA")
@@ -228,10 +211,7 @@ function chequearEncuesta(req, res, next, datosEncuesta){
     debug('Resultado de la búsqueda de una encuesta repetida: ' + resultado);
     if (resultado) {
       debug('ERROR: Ya existe una encuesta con la pregunta: "' + preg + '"');
-      req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"'); // Este sí lo muestra.
-      // const error = new Error('Ya existe una encuesta con la pregunta: "' + preg + '"');
-      // error.status = 400;
-      //return next(error);
+      req.flash('error', 'Ya existe una encuesta con la pregunta: "' + preg + '"');
       res.redirect(usuario_logueado.url + '/crearEncuesta');
     } else {
       debug('Aparentemente NO habría una encuesta del mismo usuario con esa pregunta');
@@ -244,6 +224,7 @@ function chequearEncuesta(req, res, next, datosEncuesta){
       nueva_encuesta.save(function (err) {
         if (err) {
           debug("Error guardando encuesta.");
+          debug(err);
           return next(err);
         }
         // si no hubo error llegamos acá, si hubo error, creo que no llegás acá.
