@@ -1,12 +1,5 @@
 extends layout
-
 block content
-  script(src='/js/borrar.js')
-  //.row
-  //  .col-sm-12
-  // - a(href= usuario.url + '/crearEncuesta') Crear Encuesta
-  // - h2= usuario_nombre
-  // - h2= usuario.local.username
   h3 Mis encuestas
   div.row.display-flex
     if encuestas
@@ -25,9 +18,8 @@ block content
                 p.text-danger ¡Cuidado! #{' '}
                   button.btn.btn-sm.btn-danger.borrar_encuesta(href="#" data-id= encuesta.url) Borrar la encuesta
     // - No logro hacer que funcione lo que sigue:
-    //else
-    // - p Crea una nueva encuesta
-    // -   a(href= usuario.url + '/crearEncuesta' title='Nueva encuesta')
-    // -     i.fa.fa-plus-square
-  // - hr
-  // - a.btn.btn-danger.borrar-usuario(href='#', data-id=id) Eliminar cuenta de usuario
+    // - else
+    // -   p Crea una nueva encuesta
+    // -     a(href= usuario.url + '/crearEncuesta' title='Nueva encuesta')
+    // -       i.fa.fa-plus-square
+  script(src='/js/borrar.js')
