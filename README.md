@@ -13,11 +13,14 @@
 
 ## Other things to do:
 
-- [ ] Github authentication.
+- [x] Github authentication.
 - [ ] mLab online database.
-- [ ] Deploy the app to Glitch.
 - [x] Add form validation.
-- [ ] Use cdn links for bootstrap, jquery, chart.js, fontawesome.
+- [x] Use cdn links for bootstrap, jquery, chart.js, fontawesome.
+- [ ] Deploy the app to Glitch.
+
+## Features to add at some point in the future
+- [ ] Implement a method to delete a user account.
 - [ ] Ask twice before deleting a poll (instead of deleting it inmediately after clicking the button).
 - [ ] Translate the app to English.
 - [ ] Translate the app to Esperanto.
