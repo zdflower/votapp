@@ -17,9 +17,8 @@ block content
               if usuario.local.username == encuesta.creador
                 p.text-danger ¡Cuidado! #{' '}
                   button.btn.btn-sm.btn-danger.borrar_encuesta(href="#" data-id= encuesta.url) Borrar la encuesta
-    // - No logro hacer que funcione lo que sigue:
-    // - else
-    // -   p Crea una nueva encuesta
-    // -     a(href= usuario.url + '/crearEncuesta' title='Nueva encuesta')
-    // -       i.fa.fa-plus-square
+    if encuestas.length <= 0
+      p.lead No tiene ninguna encuesta. 
+        a(href= usuario.url + '/crearEncuesta' title='Nueva encuesta') Cree una nueva 
+          i.fa.fa-plus-square
   script(src='/js/borrar.js')
