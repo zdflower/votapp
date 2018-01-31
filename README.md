@@ -1,5 +1,7 @@
 # Voting App - FCC Dynamic Web Project
 
+Please visit https://votapp.glitch.me
+
 ## User stories
 
 - [x] As an authenticated user, I can keep my polls and come back later to access them.
@@ -17,7 +19,7 @@
 - [x] mLab online database.
 - [x] Add form validation.
 - [x] Use cdn links for bootstrap, jquery, chart.js, fontawesome.
-- [ ] Deploy the app to Glitch.
+- [x] Deploy the app to Glitch.
 
 ## Features to add at some point in the future
 - [ ] Implement a method to delete a user account.
