@@ -38,7 +38,8 @@ EncuestaSchema.virtual('totalVotos').get(function(){
 });
 
 EncuestaSchema.virtual('fechaConFormato').get(function(){
-  return moment(this.fecha).format('MMMM Do, YYYY');
+  moment.locale('es')
+  return moment(this.fecha).format('dddd D, MMMM, YYYY');
 });
 
 module.exports = mongoose.model('Encuesta', EncuestaSchema);
