@@ -1,0 +1,60 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width = device-width, initial-scale = 1")
+    title Votapp
+    // - Para evitar que haga request por el favicon
+    // - fuente: https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests
+    link(rel='icon' href='data:,')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css')
+    link(rel='stylesheet' href='/css/style.css')
+
+  body
+    nav.navbar
+      .logo
+        h4 Votapp
+      .container
+        ul#common_nav.nav.navbar-nav
+          li
+            a(href='/') Encuestas #{' '}
+              i.fa.fa-home
+          li
+            a(href='/info') Info #{' '}
+              i.fa.fa-info-circle
+
+        ul#user_nav.nav.navbar-nav
+          if usuario
+            li
+              a(href= usuario.url + '/crearEncuesta' title='Nueva encuesta')
+                i.fa.fa-plus-square
+            li
+              a(href= usuario.url) #{usuario.local.username} #{' '}
+                i.fa.fa-user-circle
+            li
+              a(href='/logout' id='logout') Log out #{' '}
+                i.fa.fa-power-off
+          else
+            li
+              a(href='/signup') Sign up #{' '}
+                i.fa.fa-sign-in
+            li
+              a(href='/login') Log in #{' '}
+                i.fa.fa-hand-o-up
+    header
+      .jumbotron
+        h1 Votapp
+    main
+      script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js')
+      script(src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js')
+
+      != messages('mensajes', locals)
+
+      .container
+        block content
+    br
+    footer
+      .container
+        p Copyright &copy; 2018

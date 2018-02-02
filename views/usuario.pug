@@ -1,0 +1,24 @@
+extends layout
+block content
+  h3 Mis encuestas
+  div.row.display-flex
+    if encuestas
+      each encuesta, i in encuestas
+        div.col-xs-12.col-sm-6.col-md-4
+          .panel.panel-success
+            .panel-heading
+              h4
+                a(href= encuesta.url)= encuesta.pregunta
+                  // - a.btn.btn-sm.btn-success(href= encuesta.url) Comparte la encuesta
+                  span= ' (' + encuesta.fechaConFormato + ')'
+            .panel-body
+              h5 Opción más votada: #{encuesta.opMasVotada.op} (#{encuesta.opMasVotada.votos} votos de un total de #{encuesta.totalVotos}),
+            .panel-footer.text-right
+              if usuario.local.username == encuesta.creador
+                p.text-danger ¡Cuidado! #{' '}
+                  button.btn.btn-sm.btn-danger.borrar_encuesta(href="#" data-id= encuesta.url) Borrar la encuesta
+    if encuestas.length <= 0
+      p.lead No tiene ninguna encuesta. 
+        a(href= usuario.url + '/crearEncuesta' title='Nueva encuesta') Cree una nueva 
+          i.fa.fa-plus-square
+  script(src='/js/borrar.js')
