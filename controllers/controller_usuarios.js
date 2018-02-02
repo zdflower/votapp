@@ -14,22 +14,6 @@ const schema = Joi.object().keys({
   "passwordRe": Joi.string().trim().min(8).required()
 })
 
-exports.obtenerUsuarios = function (req, res, next){
-  Usuario.find({}, function(err, usuarios){
-    if (err){
-      console.error(err);
-      return next(err);
-    } else {
-      // si hay un usuario logueado pasar el nombre
-      if (req.user){
-        res.render('usuarios', {title: 'Usuarios', usuario: req.user, usuarios: usuarios});
-      } else {
-        res.render('usuarios', {title: 'Usuarios', usuarios: usuarios});
-      }
-    }
-  });
-};
-
 // Ver tutorial https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website
 exports.perfilUsuario = function (req, res, next){
   debug("Perfil usuario.");
