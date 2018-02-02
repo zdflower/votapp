@@ -4,32 +4,17 @@ const ControllerEncuestas = require('../controllers/controller_encuestas.js');
 const ControllerUsuarios = require('../controllers/controller_usuarios.js');
 
 module.exports = function(app, passport){
-// REVISAR Y REESCRIBIR ESTA FUNCIÓN:
   function isLoggedIn(req, res, next) {
-    console.log("isLoggedIn");
-    console.log('req.params: ');
-    console.log(req.params);
+    debug("isLoggedIn");
+    debug('req.params: ');
+    debug(req.params);
     if (req.isAuthenticated()) {
       if (req.user.local.username === req.params.username){
-        console.log("Los usuarios coinciden.")
-        // console.log("Usuario registrado: " + req.user.local.username);
-        // console.log("Parámetro usuario: " + req.params.username);
-        // console.log("Params:");
-        // console.log(req.params);
+        debug("Los usuarios coinciden.")
         return next();
       } else {
-        // El usuario está logueado pero quiere ir a una página de otro usuario para la que se necesita autenticación, como por ejemplo el perfil, crear encuesta, borrar encuesta, etc.
-        console.log("Intenta acceder a una página de otro usuario.");
-        // console.log("Usuario registrado: " + req.user.local.username);
-        // console.log("Parámetro usuario: " + req.params.username);
-        // console.log("Params:");
-        // console.log(req.params);
-        /*
-          const error = new Error("El usuario logueado y el de la página a la que quiere acceder no coinciden.");
-          error.status = 404;
-          next(error);
-        */
-        // return next(); //Acá me parece que hay un problema porque si los usuarios no coinciden debería devolverse un error
+        // Está logueado pero...
+        debug("Intenta acceder a una página de otro usuario.");
         req.flash("warning", 'No puede acceder a esa página.');
         // Lo redirijo a su propia página.
         res.redirect(req.user.url);
@@ -42,8 +27,6 @@ module.exports = function(app, passport){
 
   app.route('/').get(ControllerEncuestas.obtenerEncuestas);
 
-  app.route('/usuarios').get(ControllerUsuarios.obtenerUsuarios);
-
   app.route('/login')
     .get(ControllerUsuarios.locallogin_get)
     .post(ControllerUsuarios.locallogin_post);
@@ -53,10 +36,10 @@ module.exports = function(app, passport){
     .get(passport.authenticate('github'));
 
   app.route('/auth/github/callback')
-      .get(passport.authenticate('github', {
-        successRedirect: '/',
-        failureRedirect: '/login'
-      }));
+    .get(passport.authenticate('github', {
+      successRedirect: '/',
+      failureRedirect: '/login'
+    }));
 
   app.get('/logout', function(req, res){
     req.logout(); // función de passport
